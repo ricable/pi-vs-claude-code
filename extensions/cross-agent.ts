@@ -158,6 +158,48 @@ export default function (pi: ExtensionAPI) {
 			groups.push({ source: ".pi/agents", commands: [], skills: [], agents: localAgents });
 		}
 
+		// Scan .pi/agents/experts/ subdirectories for domain expert agents
+		const expertsDir = join(cwd, ".pi", "agents", "experts");
+		if (existsSync(expertsDir)) {
+			try {
+				for (const domain of readdirSync(expertsDir)) {
+					const domainDir = join(expertsDir, domain);
+					if (!statSync(domainDir).isDirectory()) continue;
+					// Check for subdomain directories (e.g. telecom/mobility/)
+					const entries = readdirSync(domainDir);
+					const hasMdFiles = entries.some(e => e.endsWith(".md"));
+					const hasSubdirs = entries.some(e => {
+						try { return statSync(join(domainDir, e)).isDirectory(); } catch { return false; }
+					});
+					if (hasMdFiles) {
+						const agents = scanAgents(domainDir);
+						if (agents.length) {
+							groups.push({ source: `.pi/experts/${domain}`, commands: [], skills: [], agents });
+						}
+					}
+					if (hasSubdirs) {
+						for (const sub of entries) {
+							const subDir = join(domainDir, sub);
+							try {
+								if (!statSync(subDir).isDirectory()) continue;
+								const agents = scanAgents(subDir);
+								if (agents.length) {
+									groups.push({ source: `.pi/experts/${domain}/${sub}`, commands: [], skills: [], agents });
+								}
+							} catch {}
+						}
+					}
+				}
+			} catch {}
+		}
+
+		// Scan .pi/agents/providers/ for provider agents
+		const providersDir = join(cwd, ".pi", "agents", "providers");
+		const providerAgents = scanAgents(providersDir);
+		if (providerAgents.length) {
+			groups.push({ source: ".pi/providers", commands: [], skills: [], agents: providerAgents });
+		}
+
 		// Register commands
 		const seenCmds = new Set<string>();
 		let totalCommands = 0;

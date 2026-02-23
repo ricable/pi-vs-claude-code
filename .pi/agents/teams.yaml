@@ -29,3 +29,110 @@ pi-pi:
   - tui-expert
   - prompt-expert
   - agent-expert
+
+dev:
+  - coordinator
+  - coder
+  - planner
+  - researcher
+  - reviewer
+  - tester
+
+research:
+  - researcher
+  - coordinator
+
+swarm:
+  - coordinator
+  - coder
+  - planner
+  - researcher
+  - reviewer
+  - tester
+
+vector:
+  - ruvector
+  - scout
+  - planner
+
+local:
+  - ruvector
+  - coder
+  - planner
+  - reviewer
+
+# Provider teams
+providers:
+  - gemini
+  - codex
+  - ruvllm
+
+# Software engineering domain teams
+backend-team:
+  - postgres
+  - mongodb
+  - redis
+  - graphql
+
+frontend-team:
+  - react
+  - vue
+  - tailwind
+
+fullstack-team:
+  - react
+  - postgres
+  - docker
+  - auth
+  - jest
+
+security-team:
+  - auth
+  - owasp
+  - devsecops
+  - red-team
+
+infra-team:
+  - docker
+  - kubernetes
+  - aws
+  - terraform
+
+science-team:
+  - ml-researcher
+  - data-scientist
+  - statistician
+
+business-team:
+  - product-manager
+  - analyst
+  - finance
+
+# Telecom teams
+telecom-ran:
+  - rrm
+  - throughput
+  - mobility
+  - alarm
+  - learning
+
+telecom-integrity:
+  - antenna
+  - power
+  - beam
+  - interference
+  - coverage
+
+# Mega swarm (dynamic dispatch)
+mega-swarm:
+  - coordinator
+  - planner
+  - coder
+  - reviewer
+  - tester
+  - researcher
+
+domain-factory:
+  - factory
+  - coordinator
+  - reviewer

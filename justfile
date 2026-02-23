@@ -65,6 +65,20 @@ ext-agent-chain:
 ext-pi-pi:
     pi -e extensions/pi-pi.ts -e extensions/theme-cycler.ts
 
+# 15. RuVector: document/code indexing + semantic search (RAG)
+ext-ruvector:
+    pi -e extensions/ruvector.ts -e extensions/theme-cycler.ts
+
+# 16. OpenCode: route coding tasks to a local opencode server
+# Start opencode first: opencode serve
+# Then connect: /oc-connect http://127.0.0.1:4096
+ext-opencode:
+    OC_BASE_URL=http://127.0.0.1:4096 pi -e extensions/opencode.ts -e extensions/minimal.ts
+
+# 17. Vector team: ruvector knowledge base + agent-team dispatcher
+ext-vector-team:
+    OC_BASE_URL=http://127.0.0.1:4096 pi -e extensions/ruvector.ts -e extensions/opencode.ts -e extensions/agent-team.ts -e extensions/theme-cycler.ts
+
 #ext
 
 # 15. Session Replay: scrollable timeline overlay of session history (legit)
@@ -74,6 +88,32 @@ ext-session-replay:
 # 16. Theme cycler: Ctrl+X forward, Ctrl+Q backward, /theme picker
 ext-theme-cycler:
     pi -e extensions/theme-cycler.ts -e extensions/minimal.ts
+
+#g4
+
+# 18. Orchestration: provider routing (gemini/codex/ruvllm) + swarm coordination
+ext-orchestration:
+    pi -e extensions/orchestration.ts
+
+# 19. Learning: AgentDB + ReasoningBank + SONA self-learning
+ext-learning:
+    pi -e extensions/learning.ts
+
+# 20. Combined mega-swarm session: all extensions loaded
+ext-mega:
+    pi -e extensions/orchestration.ts -e extensions/learning.ts -e extensions/agent-team.ts -e extensions/ruvector.ts
+
+# 21. Backend team: orchestration + learning + agent-team for backend work
+ext-backend-team:
+    pi -e extensions/orchestration.ts -e extensions/learning.ts -e extensions/agent-team.ts
+
+# 22. Telecom team: orchestration + learning + agent-team for telecom analysis
+ext-telecom:
+    pi -e extensions/orchestration.ts -e extensions/learning.ts -e extensions/agent-team.ts
+
+# 23. Sync agents: mirror .pi/agents → .claude/agents
+sync-agents:
+    bun scripts/sync-agents.ts
 
 # utils
 

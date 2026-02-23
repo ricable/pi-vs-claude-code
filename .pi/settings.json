@@ -2,5 +2,21 @@
   "theme": "synthwave",
   "prompts": [
     "../.claude/commands"
-  ]
+  ],
+  "mcpServers": {
+    "rvf": {
+      "command": "npx",
+      "args": ["@ruvector/rvf-mcp-server", "--transport", "stdio"],
+      "env": {
+        "RUVECTOR_BACKEND": "rvf"
+      }
+    },
+    "agentdb": {
+      "command": "npx",
+      "args": ["@claude-flow/agentdb", "mcp", "--transport", "stdio"],
+      "env": {
+        "AGENTDB_PATH": ".rvf/learning"
+      }
+    }
+  }
 }

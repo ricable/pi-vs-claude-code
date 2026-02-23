@@ -21,9 +21,10 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { Text, type AutocompleteItem, truncateToWidth, visibleWidth } from "@mariozechner/pi-tui";
 import { spawn } from "child_process";
-import { readdirSync, readFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
+import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from "fs";
 import { join, resolve } from "path";
 import { applyExtensionDefaults } from "./themeMap.ts";
+import { VectorDB } from "@ruvector/rvf-node";
 
 // ── Types ────────────────────────────────────────
 
@@ -46,6 +47,182 @@ interface AgentState {
 	sessionFile: string | null;
 	runCount: number;
 	timer?: ReturnType<typeof setInterval>;
+}
+
+// ── RVF Memory System ─────────────────────────────────────────────────────────
+
+interface Pattern {
+	id: string;
+	task: string;
+	input: string;
+	output: string;
+	reward: number;
+	success: boolean;
+	tokens: number;
+	latency: number;
+	timestamp: number;
+	tags: string[];
+	vector?: number[]; // unused in HNSW implementation, kept for API compatibility
+}
+
+const DIMENSION = 384; // RVF standard dimension
+
+class RvfMemoryStore {
+	private db: VectorDB;
+	private patterns: Map<string, Pattern> = new Map();
+	private tagsIndex: Map<string, Set<string>> = new Map();
+	private dimension = DIMENSION;
+	private loadPromise: Promise<void>;
+
+	constructor(
+		private namespace: string,
+		private storageDir?: string
+	) {
+		this.db = VectorDB.withDimensions(this.dimension);
+		this.loadPromise = this.loadFromDisk();
+	}
+
+	// Hash-based embedding (placeholder — upgrade to ruvllm when available)
+	private computeEmbedding(text: string): Float32Array {
+		const hash = this.simpleHash(text);
+		const rng = this.seededRandom(hash);
+		const vector = new Float32Array(this.dimension);
+		for (let i = 0; i < this.dimension; i++) {
+			vector[i] = rng() * 2 - 1;
+		}
+		const mag = Math.sqrt(vector.reduce((sum, v) => sum + v * v, 0));
+		for (let i = 0; i < vector.length; i++) {
+			vector[i] /= mag;
+		}
+		return vector;
+	}
+
+	private simpleHash(str: string): number {
+		let hash = 0;
+		for (let i = 0; i < str.length; i++) {
+			hash = ((hash << 5) - hash) + str.charCodeAt(i);
+			hash |= 0;
+		}
+		return Math.abs(hash);
+	}
+
+	private seededRandom(seed: number): () => number {
+		let s = seed;
+		return () => {
+			s = (s * 1103515245 + 12345) & 0x7fffffff;
+			return s / 0x7fffffff;
+		};
+	}
+
+	async storePattern(pattern: Omit<Pattern, "id" | "vector" | "timestamp">): Promise<string> {
+		await this.loadPromise;
+		const id = `${this.namespace}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+		const fullPattern: Pattern = {
+			...pattern,
+			id,
+			timestamp: Date.now(),
+		};
+		const vector = this.computeEmbedding(pattern.task + " " + pattern.input);
+		await this.db.insert({ id, vector, metadata: fullPattern });
+		this.patterns.set(id, fullPattern);
+		for (const tag of pattern.tags) {
+			if (!this.tagsIndex.has(tag)) {
+				this.tagsIndex.set(tag, new Set());
+			}
+			this.tagsIndex.get(tag)!.add(id);
+		}
+		this.saveToDisk();
+		return id;
+	}
+
+	async searchPatterns(query: string, k: number = 5, tags?: string[]): Promise<Pattern[]> {
+		await this.loadPromise;
+		const queryVector = this.computeEmbedding(query);
+		if (tags && tags.length > 0) {
+			// Search wider, then filter by tags
+			const results = await this.db.search({ vector: queryVector, k: k * 10 });
+			return results
+				.map(r => r.metadata as Pattern)
+				.filter(p => p && tags.some(tag => p.tags.includes(tag)))
+				.slice(0, k);
+		}
+		const results = await this.db.search({ vector: queryVector, k });
+		return results.map(r => r.metadata as Pattern).filter(Boolean);
+	}
+
+	async getPattern(id: string): Promise<Pattern | null> {
+		await this.loadPromise;
+		return this.patterns.get(id) || null;
+	}
+
+	async deletePattern(id: string): Promise<boolean> {
+		await this.loadPromise;
+		const pattern = this.patterns.get(id);
+		if (!pattern) return false;
+		for (const tag of pattern.tags) {
+			this.tagsIndex.get(tag)?.delete(id);
+		}
+		this.patterns.delete(id);
+		try { await this.db.delete(id); } catch {}
+		this.saveToDisk();
+		return true;
+	}
+
+	async getStats(): Promise<{ total: number; byTag: Record<string, number>; avgReward: number }> {
+		await this.loadPromise;
+		const byTag: Record<string, number> = {};
+		let totalReward = 0;
+		let count = 0;
+		for (const pattern of this.patterns.values()) {
+			totalReward += pattern.reward;
+			count++;
+			for (const tag of pattern.tags) {
+				byTag[tag] = (byTag[tag] || 0) + 1;
+			}
+		}
+		return {
+			total: this.patterns.size,
+			byTag,
+			avgReward: count > 0 ? totalReward / count : 0,
+		};
+	}
+
+	private storagePath(): string {
+		return this.storageDir
+			? join(this.storageDir, `${this.namespace}.json`)
+			: join(".rvf", `${this.namespace}.json`);
+	}
+
+	private saveToDisk(): void {
+		if (!this.storageDir) return;
+		try {
+			if (!existsSync(this.storageDir)) {
+				mkdirSync(this.storageDir, { recursive: true });
+			}
+			writeFileSync(this.storagePath(), JSON.stringify(Array.from(this.patterns.values()), null, 2));
+		} catch {}
+	}
+
+	private async loadFromDisk(): Promise<void> {
+		if (!this.storageDir) return;
+		try {
+			const path = this.storagePath();
+			if (!existsSync(path)) return;
+			const data: Pattern[] = JSON.parse(readFileSync(path, "utf-8"));
+			const inserts = data.map(p => {
+				this.patterns.set(p.id, p);
+				for (const tag of p.tags || []) {
+					if (!this.tagsIndex.has(tag)) {
+						this.tagsIndex.set(tag, new Set());
+					}
+					this.tagsIndex.get(tag)!.add(p.id);
+				}
+				const vector = this.computeEmbedding(p.task + " " + p.input);
+				return this.db.insert({ id: p.id, vector, metadata: p });
+			});
+			await Promise.all(inserts);
+		} catch {}
+	}
 }
 
 // ── Display Name Helper ──────────────────────────
@@ -560,6 +737,309 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
+	// ── RVF Memory Store Instance ────────────────
+
+	let memoryStore: RvfMemoryStore | null = null;
+
+	function getMemoryStore(cwd: string): RvfMemoryStore {
+		if (!memoryStore) {
+			const storageDir = join(cwd, ".rvf");
+			memoryStore = new RvfMemoryStore("patterns", storageDir);
+		}
+		return memoryStore;
+	}
+
+	// ── Memory Tools ──────────────────────────────
+
+	pi.registerTool({
+		name: "store_pattern",
+		label: "Store Pattern",
+		description: "Store a successful task pattern in memory for future retrieval",
+		parameters: Type.Object({
+			task: Type.String({ description: "Task description" }),
+			input: Type.String({ description: "Input that led to success" }),
+			output: Type.String({ description: "The output/result" }),
+			reward: Type.Number({ description: "Reward score (0-1)" }),
+			success: Type.Boolean({ description: "Whether the task succeeded" }),
+			tokens: Type.Number({ description: "Tokens used" }),
+			latency: Type.Number({ description: "Latency in ms" }),
+			tags: Type.Array(Type.String(), { description: "Tags for categorization" }),
+		}),
+
+		async execute(_toolCallId, params, _signal, onUpdate, ctx) {
+			const { task, input, output, reward, success, tokens, latency, tags } = params as any;
+			const store = getMemoryStore(ctx.cwd);
+
+			try {
+				const id = await store.storePattern({
+					task,
+					input,
+					output,
+					reward,
+					success,
+					tokens,
+					latency,
+					tags,
+				});
+
+				return {
+					content: [{ type: "text", text: `Pattern stored: ${id}` }],
+					details: { id, status: "stored" },
+				};
+			} catch (err: any) {
+				return {
+					content: [{ type: "text", text: `Error storing pattern: ${err?.message || err}` }],
+					details: { status: "error" },
+				};
+			}
+		},
+
+		renderCall(args, theme) {
+			const task = (args as any).task || "";
+			const preview = task.length > 40 ? task.slice(0, 37) + "..." : task;
+			return new Text(
+				theme.fg("toolTitle", theme.bold("store_pattern ")) +
+				theme.fg("muted", preview),
+				0, 0,
+			);
+		},
+
+		renderResult(result, _options, theme) {
+			const text = result.content[0];
+			return new Text(
+				theme.fg("success", text?.type === "text" ? text.text : ""),
+				0, 0,
+			);
+		},
+	});
+
+	pi.registerTool({
+		name: "search_patterns",
+		label: "Search Patterns",
+		description: "Search stored patterns by similarity",
+		parameters: Type.Object({
+			query: Type.String({ description: "Search query" }),
+			k: Type.Number({ description: "Number of results (default 5)" }),
+			tags: Type.Optional(Type.Array(Type.String(), { description: "Filter by tags" })),
+		}),
+
+		async execute(_toolCallId, params, _signal, onUpdate, ctx) {
+			const { query, k = 5, tags } = params as any;
+			const store = getMemoryStore(ctx.cwd);
+
+			try {
+				const patterns = await store.searchPatterns(query, k, tags);
+
+				if (patterns.length === 0) {
+					return {
+						content: [{ type: "text", text: "No patterns found" }],
+						details: { patterns: [], count: 0 },
+					};
+				}
+
+				const results = patterns.map(p => ({
+					id: p.id,
+					task: p.task,
+					success: p.success,
+					reward: p.reward,
+					timestamp: p.timestamp,
+				}));
+
+				return {
+					content: [{
+						type: "text",
+						text: `Found ${patterns.length} patterns:\n${results.map(r => `- ${r.task.slice(0, 50)}... (${r.success ? "✓" : "✗"})`).join("\n")}`,
+					}],
+					details: { patterns: results, count: patterns.length },
+				};
+			} catch (err: any) {
+				return {
+					content: [{ type: "text", text: `Error searching patterns: ${err?.message || err}` }],
+					details: { status: "error" },
+				};
+			}
+		},
+
+		renderCall(args, theme) {
+			const query = (args as any).query || "";
+			const preview = query.length > 40 ? query.slice(0, 37) + "..." : query;
+			return new Text(
+				theme.fg("toolTitle", theme.bold("search_patterns ")) +
+				theme.fg("muted", preview),
+				0, 0,
+			);
+		},
+
+		renderResult(result, _options, theme) {
+			const details = result.details as any;
+			if (!details || details.count === 0) {
+				return new Text(theme.fg("dim", "No patterns found"), 0, 0);
+			}
+			return new Text(
+				theme.fg("success", `${details.count} patterns found`),
+				0, 0,
+			);
+		},
+	});
+
+	pi.registerTool({
+		name: "get_pattern",
+		label: "Get Pattern",
+		description: "Retrieve a specific pattern by ID",
+		parameters: Type.Object({
+			id: Type.String({ description: "Pattern ID" }),
+		}),
+
+		async execute(_toolCallId, params, _signal, onUpdate, ctx) {
+			const { id } = params as any;
+			const store = getMemoryStore(ctx.cwd);
+
+			try {
+				const pattern = await store.getPattern(id);
+
+				if (!pattern) {
+					return {
+						content: [{ type: "text", text: `Pattern not found: ${id}` }],
+						details: { found: false },
+					};
+				}
+
+				return {
+					content: [{
+						type: "text",
+						text: `Task: ${pattern.task}\nInput: ${pattern.input}\nOutput: ${pattern.output.slice(0, 200)}...\nSuccess: ${pattern.success}, Reward: ${pattern.reward}`,
+					}],
+					details: { pattern, found: true },
+				};
+			} catch (err: any) {
+				return {
+					content: [{ type: "text", text: `Error retrieving pattern: ${err?.message || err}` }],
+					details: { status: "error" },
+				};
+			}
+		},
+
+		renderCall(args, theme) {
+			const id = (args as any).id || "";
+			return new Text(
+				theme.fg("toolTitle", theme.bold("get_pattern ")) +
+				theme.fg("accent", id.slice(0, 20)),
+				0, 0,
+			);
+		},
+
+		renderResult(result, _options, theme) {
+			const details = result.details as any;
+			if (!details?.found) {
+				return new Text(theme.fg("error", "Pattern not found"), 0, 0);
+			}
+			return new Text(theme.fg("success", "Pattern retrieved"), 0, 0);
+		},
+	});
+
+	// ── Swarm Tools ───────────────────────────────
+
+	pi.registerTool({
+		name: "swarm_status",
+		label: "Swarm Status",
+		description: "Get status of all active swarm agents",
+		parameters: Type.Object({}),
+
+		async execute(_toolCallId, _params, _signal, onUpdate, _ctx) {
+			const agents = Array.from(agentStates.values()).map(s => ({
+				name: displayName(s.def.name),
+				status: s.status,
+				task: s.task || s.def.description,
+				elapsed: s.elapsed,
+				runCount: s.runCount,
+			}));
+
+			return {
+				content: [{
+					type: "text",
+					text: agents.length === 0
+						? "No agents in swarm"
+						: `Active Agents (${agents.length}):\n${agents.map(a => `${a.name}: ${a.status}${a.task ? ` - ${a.task.slice(0, 30)}...` : ""}`).join("\n")}`,
+				}],
+				details: { agents, count: agents.length },
+			};
+		},
+
+		renderCall(_args, theme) {
+			return new Text(
+				theme.fg("toolTitle", theme.bold("swarm_status")),
+				0, 0,
+			);
+		},
+
+		renderResult(result, _options, theme) {
+			const details = result.details as any;
+			return new Text(
+				theme.fg("accent", `${details?.count || 0} agents`),
+				0, 0,
+			);
+		},
+	});
+
+	pi.registerTool({
+		name: "orchestrate",
+		label: "Orchestrate",
+		description: "Orchestrate multiple agents in parallel for a complex task",
+		parameters: Type.Object({
+			task: Type.String({ description: "Main task description" }),
+			agents: Type.Array(Type.String(), { description: "Agent names to dispatch" }),
+		}),
+
+		async execute(_toolCallId, params, _signal, onUpdate, ctx) {
+			const { task, agents } = params as any;
+
+			if (!agents || agents.length === 0) {
+				return {
+					content: [{ type: "text", text: "No agents specified for orchestration" }],
+					details: { status: "error" },
+				};
+			}
+
+			// Dispatch all agents in parallel
+			const results = await Promise.all(
+				agents.map(agent => dispatchAgent(agent, task, ctx))
+			);
+
+			const summary = results.map((r, i) => ({
+				agent: agents[i],
+				success: r.exitCode === 0,
+				elapsed: r.elapsed,
+			}));
+
+			return {
+				content: [{
+					type: "text",
+					text: `Orchestrated ${agents.length} agents:\n${summary.map(s => `${s.agent}: ${s.success ? "✓" : "✗"} (${Math.round(s.elapsed / 1000)}s)`).join("\n")}`,
+				}],
+				details: { summary, status: "complete" },
+			};
+		},
+
+		renderCall(args, theme) {
+			const agents = (args as any).agents || [];
+			return new Text(
+				theme.fg("toolTitle", theme.bold("orchestrate ")) +
+				theme.fg("accent", agents.join(", ")),
+				0, 0,
+			);
+		},
+
+		renderResult(result, _options, theme) {
+			const details = result.details as any;
+			const successCount = details?.summary?.filter((s: any) => s.success).length || 0;
+			const total = details?.summary?.length || 0;
+			const icon = successCount === total ? "✓" : successCount > 0 ? "◐" : "✗";
+			const color = successCount === total ? "success" : successCount > 0 ? "accent" : "error";
+
+			return new Text(theme.fg(color, `${icon} ${successCount}/${total} agents`), 0, 0);
+		},
+	});
+
 	// ── Commands ─────────────────────────────────
 
 	pi.registerCommand("agents-team", {
@@ -626,6 +1106,49 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
+	pi.registerCommand("memory-stats", {
+		description: "Show memory pattern statistics",
+		handler: async (_args, _ctx) => {
+			const store = getMemoryStore(_ctx.cwd);
+			const stats = await store.getStats();
+
+			_ctx.ui.notify(
+				`Memory Stats:\n` +
+				`- Total patterns: ${stats.total}\n` +
+				`- Average reward: ${stats.avgReward.toFixed(2)}\n` +
+				`- Tags: ${Object.entries(stats.byTag).map(([k, v]) => `${k}: ${v}`).join(", ")}`,
+				"info",
+			);
+		},
+	});
+
+	pi.registerCommand("team", {
+		description: "Select a team to work with (shorthand for /agents-team)",
+		handler: async (_args, _ctx) => {
+			// Trigger the same flow as agents-team
+			const teamNames = Object.keys(teams);
+			if (teamNames.length === 0) {
+				_ctx.ui.notify("No teams defined in .pi/agents/teams.yaml", "warning");
+				return;
+			}
+
+			const options = teamNames.map(name => {
+				const members = teams[name].map(m => displayName(m));
+				return `${name} — ${members.join(", ")}`;
+			});
+
+			const choice = await _ctx.ui.select("Select Team", options);
+			if (choice === undefined) return;
+
+			const idx = options.indexOf(choice);
+			const name = teamNames[idx];
+			activateTeam(name);
+			updateWidget();
+			_ctx.ui.setStatus("agent-team", `Team: ${name} (${agentStates.size})`);
+			_ctx.ui.notify(`Team: ${name} — ${Array.from(agentStates.values()).map(s => displayName(s.def.name)).join(", ")}`, "info");
+		},
+	});
+
 	// ── System Prompt Override ───────────────────
 
 	pi.on("before_agent_start", async (_event, _ctx) => {
@@ -653,12 +1176,27 @@ You can ONLY dispatch to agents listed below. Do not attempt to dispatch to agen
 - If a task fails, try a different agent or adjust the task description
 - Summarize the outcome for the user
 
+## Memory Tools (for learning from experience)
+- **store_pattern**: Store successful task patterns for future retrieval
+  - Use after successful agent dispatches to learn from success
+  - Tags help categorize: "auth", "api", "refactor", "bugfix", etc.
+- **search_patterns**: Find similar past tasks
+  - Use before complex tasks to find relevant patterns
+  - Retrieves top-k most similar successful approaches
+- **get_pattern**: Retrieve full pattern details by ID
+
+## Swarm Tools
+- **swarm_status**: View all active agents and their status
+- **orchestrate**: Dispatch multiple agents in parallel for complex tasks
+  - Useful for parallel sub-tasks that don't depend on each other
+
 ## Rules
 - NEVER try to read, write, or execute code directly — you have no such tools
 - ALWAYS use dispatch_agent to get work done
 - You can chain agents: use scout to explore, then builder to implement
 - You can dispatch the same agent multiple times with different tasks
 - Keep tasks focused — one clear objective per dispatch
+- Use memory tools to learn from successful patterns
 
 ## Agents
 
@@ -676,6 +1214,9 @@ ${agentCatalog}`,
 		}
 		widgetCtx = _ctx;
 		contextWindow = _ctx.model?.contextWindow || 0;
+
+		// Initialize memory store
+		getMemoryStore(_ctx.cwd);
 
 		// Wipe old agent session files so subagents start fresh
 		const sessDir = join(_ctx.cwd, ".pi", "agent-sessions");
@@ -695,17 +1236,27 @@ ${agentCatalog}`,
 			activateTeam(teamNames[0]);
 		}
 
-		// Lock down to dispatcher-only (tool already registered at top level)
-		pi.setActiveTools(["dispatch_agent"]);
+		// Lock down to dispatcher + memory + swarm tools (tools registered at top level)
+		pi.setActiveTools([
+			"dispatch_agent",
+			"store_pattern",
+			"search_patterns",
+			"get_pattern",
+			"swarm_status",
+			"orchestrate",
+		]);
 
 		_ctx.ui.setStatus("agent-team", `Team: ${activeTeamName} (${agentStates.size})`);
 		const members = Array.from(agentStates.values()).map(s => displayName(s.def.name)).join(", ");
 		_ctx.ui.notify(
 			`Team: ${activeTeamName} (${members})\n` +
 			`Team sets loaded from: .pi/agents/teams.yaml\n\n` +
-			`/agents-team          Select a team\n` +
-			`/agents-list          List active agents and status\n` +
-			`/agents-grid <1-6>    Set grid column count`,
+			`/team               Select a team\n` +
+			`/agents-team        Select a team (alias)\n` +
+			`/agents-list        List active agents and status\n` +
+			`/agents-grid <1-6>  Set grid column count\n` +
+			`/memory-stats       Show pattern memory stats\n\n` +
+			`Tools: dispatch_agent, store_pattern, search_patterns, swarm_status, orchestrate`,
 			"info",
 		);
 		updateWidget();

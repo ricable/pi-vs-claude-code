@@ -1,0 +1,82 @@
+template_classes:
+  backend:
+    tools: read,write,edit,bash,grep,find,ls
+    focus: "Server-side implementation, APIs, databases"
+  frontend:
+    tools: read,write,edit,bash,grep,find,ls
+    focus: "UI/UX implementation, components, styling"
+  infra:
+    tools: read,write,edit,bash,grep,find,ls
+    focus: "Infrastructure, deployment, cloud services"
+  security:
+    tools: read,write,edit,bash,grep,find,ls
+    focus: "Security assessment, hardening, compliance"
+  testing:
+    tools: read,write,edit,bash,grep,find,ls
+    focus: "Test creation, execution, coverage analysis"
+  mobile:
+    tools: read,write,edit,bash,grep,find,ls
+    focus: "Mobile app development, cross-platform"
+  science:
+    tools: read,write,edit,bash,grep,find,ls
+    focus: "Research, analysis, scientific computing"
+  business:
+    tools: read,grep,find,ls
+    focus: "Strategy, analysis, planning"
+  telecom:
+    tools: read,grep,find,ls,bash
+    focus: "RAN optimization, KPI analysis, parameter tuning"
+
+agents:
+  # Backend
+  - { name: postgres, domain: backend, specialization: "PostgreSQL design and optimization" }
+  - { name: mongodb, domain: backend, specialization: "MongoDB schema and aggregation" }
+  - { name: redis, domain: backend, specialization: "Redis caching and data structures" }
+  - { name: graphql, domain: backend, specialization: "GraphQL schema and resolvers" }
+  # Frontend
+  - { name: react, domain: frontend, specialization: "React components and hooks" }
+  - { name: vue, domain: frontend, specialization: "Vue 3 composition API" }
+  - { name: threejs, domain: frontend, specialization: "Three.js 3D rendering" }
+  - { name: tailwind, domain: frontend, specialization: "Tailwind CSS styling" }
+  # Infra
+  - { name: docker, domain: infra, specialization: "Docker containerization" }
+  - { name: kubernetes, domain: infra, specialization: "Kubernetes orchestration" }
+  - { name: aws, domain: infra, specialization: "AWS cloud services" }
+  - { name: terraform, domain: infra, specialization: "Infrastructure as code" }
+  # Security
+  - { name: auth, domain: security, specialization: "Authentication and authorization" }
+  - { name: owasp, domain: security, specialization: "Vulnerability assessment" }
+  - { name: devsecops, domain: security, specialization: "CI/CD security pipeline" }
+  # Testing
+  - { name: cypress, domain: testing, specialization: "E2E testing" }
+  - { name: jest, domain: testing, specialization: "Unit/integration testing" }
+  - { name: playwright, domain: testing, specialization: "Cross-browser testing" }
+  # Mobile
+  - { name: react-native, domain: mobile, specialization: "React Native cross-platform" }
+  - { name: swift, domain: mobile, specialization: "Swift iOS development" }
+  - { name: kotlin, domain: mobile, specialization: "Kotlin Android development" }
+  # Science
+  - { name: ml-researcher, domain: science, specialization: "Machine learning research" }
+  - { name: data-scientist, domain: science, specialization: "Data analysis and visualization" }
+  - { name: bioinformatics, domain: science, specialization: "Computational biology" }
+  - { name: physicist, domain: science, specialization: "Physics simulation" }
+  - { name: statistician, domain: science, specialization: "Statistical analysis" }
+  # Business
+  - { name: product-manager, domain: business, specialization: "Product strategy" }
+  - { name: analyst, domain: business, specialization: "Business analysis" }
+  - { name: marketer, domain: business, specialization: "Marketing strategy" }
+  - { name: finance, domain: business, specialization: "Financial modeling" }
+  # Telecom (27 agents - abbreviated)
+  - { name: mobility, domain: telecom, specialization: "Handover optimization" }
+  - { name: throughput, domain: telecom, specialization: "DL/UL throughput optimization" }
+  - { name: rrm, domain: telecom, specialization: "Radio resource management" }
+  - { name: antenna, domain: telecom, specialization: "Antenna tilt optimization" }
+  - { name: power, domain: telecom, specialization: "Power control optimization" }
+  - { name: beam, domain: telecom, specialization: "Beam management" }
+  - { name: interference, domain: telecom, specialization: "Interference management" }
+  - { name: coverage, domain: telecom, specialization: "Coverage optimization" }
+  - { name: energy, domain: telecom, specialization: "Energy efficiency" }
+  - { name: loadbalance, domain: telecom, specialization: "Load balancing" }
+  - { name: 5g-nr, domain: telecom, specialization: "5G NR optimization" }
+  - { name: 4g-lte, domain: telecom, specialization: "4G LTE optimization" }
+  - { name: learning, domain: telecom, specialization: "ML-based RAN optimization" }

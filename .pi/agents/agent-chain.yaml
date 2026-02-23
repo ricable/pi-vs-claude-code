@@ -47,3 +47,59 @@ full-review:
       prompt: "Implement this plan:\n\n$INPUT"
     - agent: reviewer
       prompt: "Review this implementation:\n\n$INPUT"
+
+provider-research:
+  description: "RAG-enhanced research using ruvector + researcher + planner"
+  steps:
+    - agent: ruvector
+      prompt: "Index relevant files for: $INPUT"
+    - agent: researcher
+      prompt: "Research: $INPUT using indexed knowledge"
+    - agent: planner
+      prompt: "Create implementation plan for: $ORIGINAL"
+
+expert-build:
+  description: "Domain-expert implementation with review"
+  steps:
+    - agent: planner
+      prompt: "Architect solution for: $INPUT"
+    - agent: coder
+      prompt: "Implement: $INPUT (plan: $INPUT)"
+    - agent: reviewer
+      prompt: "Review implementation for: $ORIGINAL"
+
+learn-improve:
+  description: "Pattern-aware coding using past episodes"
+  steps:
+    - agent: scout
+      prompt: "Explore codebase for context: $INPUT"
+    - agent: ruvector
+      prompt: "Search similar patterns: $INPUT"
+    - agent: coder
+      prompt: "Code using patterns: $INPUT"
+
+full-swarm:
+  description: "Coordinator dispatches parallel domain experts"
+  steps:
+    - agent: coordinator
+      prompt: "Break down and dispatch to domain experts: $INPUT"
+
+mega-swarm:
+  description: "All available experts on a complex task"
+  steps:
+    - agent: coordinator
+      prompt: "Orchestrate all relevant domain experts for: $INPUT"
+    - agent: reviewer
+      prompt: "Aggregate and validate results for: $ORIGINAL"
+    - agent: documenter
+      prompt: "Document final solution for: $ORIGINAL"
+
+telecom-analysis:
+  description: "Telecom RAN analysis chain"
+  steps:
+    - agent: rrm
+      prompt: "RRM analysis for: $INPUT"
+    - agent: throughput
+      prompt: "Throughput optimization for: $ORIGINAL (context: $INPUT)"
+    - agent: learning
+      prompt: "Extract learnings from analysis: $ORIGINAL"
