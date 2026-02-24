@@ -1,0 +1,223 @@
+## ZeroClaw Domain Grouping - 26 Agents → 7 KPI Personas
+## Phase 4: Knowledge Base Reorganization
+
+personas:
+  RAN-ACC:
+    domain: accessibility
+    description: RACH/RRC optimization, admission control, ERAB setup
+    agents:
+      - admission-agent
+      - capacity-agent
+    kpis:
+      - rrc_setup_sr
+      - rach_sr
+      - erab_setup_sr
+      - call_setup_time
+    oran_role: xApp
+    optimization_levers:
+      - admission_control_params
+      - rach_config
+      - resource_reservation
+      - cell_load_sharing
+
+  RAN-RET:
+    domain: retainability
+    description: Drop cause analysis, timer optimization, abnormal release reduction
+    agents:
+      - alarm-agent
+      - resilience-agent
+    kpis:
+      - call_drop_rate
+      - erab_abnormal_release_rate
+      - rrc_abnormal_release
+      - rlc_reset_rate
+    oran_role: xApp
+    optimization_levers:
+      - timer_configs
+      - drb_settings
+      - rlc_params
+      - ho_failure_recovery
+
+  RAN-MOB:
+    domain: mobility
+    description: Handover optimization, neighbor management, ping-pong prevention
+    agents:
+      - mobility-agent
+      - neighbor-agent
+    kpis:
+      - ho_success_rate
+      - ping_pong_ho_rate
+      - intra_freq_ho_success
+      - inter_freq_ho_success
+      - inter_rat_ho_success
+    oran_role: xApp
+    optimization_levers:
+      - a3_offset
+      - a5_threshold
+      - time_to_trigger
+      - hysteresis
+      - n_cell_change_order
+
+  RAN-TPT:
+    domain: throughput
+    description: Scheduler optimization, MIMO configuration, CA strategy
+    agents:
+      - throughput-agent
+      - link-adaptation-agent
+      - ca-agent
+    kpis:
+      - avg_dl_throughput
+      - avg_ul_throughput
+      - spectral_efficiency
+      - dl_latency_99th
+      - ul_latency_99th
+    oran_role: xApp/dApp
+    optimization_levers:
+      - scheduling_policy
+      - mcs_tables
+      - mimo_config
+      - ca_activation
+      - transmission_mode
+
+  RAN-AVL:
+    domain: availability
+    description: Alarm correlation, predictive maintenance, high availability config
+    agents:
+      - enm-api-agent
+    kpis:
+      - cell_availability_percent
+      - mttr
+      - alarm_correlation_accuracy
+      - false_alarm_rate
+    oran_role: rApp
+    optimization_levers:
+      - redundancy_config
+      - failover_triggers
+      - alarm_thresholds
+      - maintenance_windows
+
+  RAN-INT:
+    domain: integrity
+    description: Interference analysis, power control, beamforming, signal quality
+    agents:
+      - interference-agent
+      - beam-agent
+      - power-agent
+      - antenna-agent
+    kpis:
+      - cqi_distribution
+      - bler
+      - sinr
+      - prach_sinr
+      - pucch_sinr
+    oran_role: xApp/dApp
+    optimization_levers:
+      - power_control
+      - beamforming_weights
+      - interference_coordination
+      - tx_power_limits
+
+  RAN-UTL:
+    domain: utilization
+    description: Load balancing, energy saving, capacity planning, PRB efficiency
+    agents:
+      - loadbalance-agent
+      - energy-agent
+      - coverage-agent
+    kpis:
+      - prb_usage_percent
+      - active_ue_count
+      - energy_consumption
+      - power_headroom
+      - cell_sleep_efficiency
+    oran_role: rApp
+    optimization_levers:
+      - load_balancing
+      - carrier_sleep
+      - energy_saving_modes
+      - cell_clustering
+
+  cross-domain:
+    description: Multi-domain optimization, aggregators, and RAT-specific orchestrators
+    agents:
+      - rrm-agent
+      - learning-agent
+      - 4g-lte-agent
+      - 5g-nr-agent
+    roles:
+      - rrm-agent: Resolves conflicts between domain personas via KPI voting
+      - learning-agent: Learns patterns across intents and domains via SONA
+      - 4g-lte-agent: 4G-specific optimizations and constraints
+      - 5g-nr-agent: 5G NR optimizations, beamforming, massive MIMO
+
+## Known Parameter-KPI Dependencies
+
+parameter_kpi_map:
+  a3_offset:
+    domains: ["mobility", "throughput"]
+    kpis:
+      - ho_success_rate: "↑ Increases (more liberal HO)"
+      - time_on_best_server: "↓ Decreases (more frequent HO)"
+      - avg_dl_throughput: "↓ May decrease (shorter sessions)"
+    description: "A3 offset drives HO frequency; trade-off between mobility and throughput"
+
+  cell_sleep_mode:
+    domains: ["utilization", "accessibility", "retainability"]
+    kpis:
+      - energy_consumption: "↓ Decreases"
+      - rrc_setup_sr: "↓ May decrease during sleep"
+      - call_drop_rate: "↑ May increase if active calls exist"
+    description: "Energy saving must not compromise call handling capacity"
+
+  power_control:
+    domains: ["integrity", "throughput", "utilization"]
+    kpis:
+      - cqi_distribution: "↑ Better CQI (higher power)"
+      - sinr: "↑ Improved signal quality"
+      - energy_consumption: "↑ Increases (higher power)"
+    description: "Higher power improves signal but increases energy usage"
+
+  scheduling_policy:
+    domains: ["throughput", "accessibility", "utilization"]
+    kpis:
+      - avg_dl_throughput: "↑ Optimized throughput"
+      - fairness: "↔ Trade-off with max-throughput"
+      - prb_usage: "↑ Better PRB utilization"
+    description: "Different scheduling polices optimize for different objectives"
+
+## Conflict Resolution Rules (Seed Data)
+
+conflicts:
+  - id: a3-offset-conflict
+    parameter: a3_offset
+    domains: [mobility, throughput]
+    severity: high
+    description: "Lower A3 offset increases HO success but reduces time-on-best-server, decreasing throughput"
+    resolution_strategy: intent-priority
+    resolution_rules:
+      - "If intent prioritizes 'voice quality' (HO-focused) → RAN-MOB wins"
+      - "If intent prioritizes 'peak data rates' (TPT-focused) → RAN-TPT wins"
+      - "Default: Both propose, RRM arbitrates via KPI voting (7-step consensus)"
+
+  - id: energy-saving-conflict
+    parameter: cellSleepMode
+    domains: [utilization, accessibility, retainability]
+    severity: high
+    description: "Cell sleep for energy saving degrades accessibility if active sessions exist"
+    resolution_strategy: constraint-negotiation
+    resolution_rules:
+      - "RAN-UTL proposes: Activate sleep only on carriers with zero active voice sessions"
+      - "RAN-UTL provides RAN-ACC with real-time 'voice_session_occupancy' feed"
+      - "Both agree on shared threshold: call_drop_rate < 0.5%"
+      - "If threshold breached, energy saving auto-suspends until condition recovers"
+
+  - id: power-control-conflict
+    parameter: txPowerLimit
+    domains: [integrity, utilization, throughput]
+    severity: medium
+    description: "Higher TX power improves signal quality but increases energy usage"
+    resolution_strategy: constraint-negotiation
+    resolution_rules:
+      - "RAN-INT proposes minimum power for target BLER (e.g., -40 dBm)"
+      - "RAN-UTL proposes maximum power for energy efficiency (e.g., -30 dBm)"
+      - "Both negotiate to optimal range using SINR targets"

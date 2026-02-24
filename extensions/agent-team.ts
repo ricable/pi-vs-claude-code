@@ -514,7 +514,7 @@ export default function (pi: ExtensionAPI) {
 
 		const model = ctx.model
 			? `${ctx.model.provider}/${ctx.model.id}`
-			: "openrouter/google/gemini-3-flash-preview";
+			: "openrouter/google/gemini-3.1-pro";
 
 		// Session file for this agent
 		const agentKey = state.def.name.toLowerCase().replace(/\s+/g, "-");

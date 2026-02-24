@@ -1,0 +1,252 @@
+name: 4g-lte-agent
+version: 3.0.0
+description: LTE RAN specialist for E-UTRAN configuration and optimization
+
+# Agent Metadata
+domain: LTE
+technology: 4G
+agent_type: specialist
+role: lte-optimization
+
+capabilities:
+  # Physical Layer Configuration
+  - PRACH configuration and optimization (preamble allocation, Ncs tuning)
+  - PUCCH resource management (Format 1a/1b/3, ACK/NACK bundling)
+  - PDSCH/PDCCH resource allocation and optimization
+  - SRS (Sounding Reference Signal) configuration
+  - CQI reporting optimization and feedback mechanisms
+
+  # Cell Configuration
+  - E-UTRAN cell parameter tuning (DL/UL bandwidth, frame structure)
+  - LTE-M (eMTC) specific optimizations
+  - NB-IoT co-existence and resource partitioning
+  - Coverage enhancement techniques
+  - Reference signal configuration (CRS, PSS, SSS)
+
+  # Carrier Aggregation (LTE)
+  - Intra-band contiguous and non-contiguous CA
+  - Inter-band CA cross-carriers (Band combinations)
+  - CA activation/deactivation criteria
+  - Component carrier BWP management
+  - Dual connectivity (EN-DC) preparation
+
+  # Handover Optimization
+  - Intra-LTE handover (HO) success rate improvement
+  - Measurement configuration and report optimization
+  - A3 event triggering and hysteresis tuning
+  - Time-to-trigger optimization
+  - Handover failure recovery
+
+  # Power Control
+  - Uplink power control (open/closed loop)
+  - Downlink power allocation (RS power, PA/PB tuning)
+  - Power headroom reporting analysis
+  - Transmit power spectral density management
+
+  # System Information
+  - SIB scheduling and repetition optimization
+  - SIB1 MCS and repetition tuning
+  - System information acquisition optimization
+
+  # Advanced Optimization
+  - Load distribution across cells
+  - LTE-specific admission control
+  - QoS guarantee management (GBR/Non-GBR)
+
+patterns:
+  - /PRACH|preamble/i
+  - /PUCCH|format/i
+  - /EUtranCell/i
+  - /lte|LTE|eutran/i
+  - /CarrierAggregation.*LTE|CA|intra-band|inter-band/i
+  - /SIB[1-9]|system.*info/i
+  - /pdcch|pdsch|resource.*allocation/i
+  - /CQI|CRS|PSS|SSS|reference.*signal/i
+  - /power.*control|power.*headroom/i
+  - /handover|HO|A3.*event/i
+  - /LTE-M|eMTC|NB-IoT/i
+
+autonomy_threshold: 85
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+broadcast_groups:
+  - RanSpecialists
+  - TechnologyGroup
+  - LTEExperts
+  - CellConfiguration
+  - PhysicalLayer
+
+memory_namespace: lte-patterns
+
+kpi_focus:
+  # Connection Establishment
+  - pmRrcConnEstabSucc
+  - pmRrcConnEstabAtt
+  - pmRrcConnEstabFail
+  - pmRrcConnEstabTime
+
+  # Bearer/Radio Resource Establishment
+  - pmErabEstabSuccInit
+  - pmErabEstabAttInit
+  - pmErabEstabFailCong
+  - pmErabEstabFailNoRadio
+
+  # S1 Signaling
+  - pmS1SigConnEstabSucc
+  - pmS1SigConnEstabAtt
+
+  # Handover Performance
+  - pmHoExeSuccRate
+  - pmHoPrepSuccRate
+  - pmHoExeFail
+  - pmHoPrepFail
+
+  # Resource Utilization
+  - pmPrbUtilDl
+  - pmPrbUtilUl
+  - pmActiveUeDl
+  - pmActiveUeUl
+
+  # Quality Metrics
+  - pmDlDataVolume
+  - pmUlDataVolume
+  - pmCqiDl
+
+  # Uplink Power
+  - pmPuschPowerHeadroom
+  - pmPuschInterference
+
+expertise_level: expert
+specialization:
+  - eutran_optimization
+  - carrier_aggregation
+  - physical_layer_tuning
+  - connection_establishment
+  - power_management
+
+dependencies:
+  - requires_knowledge: RRM, CAC, load_balancing
+  - supports: mobility_optimization, inter_rat_ho
+  - compatible_with: 5G, NR
+
+fallback_agents:
+  - rrm-agent
+  - mobility-agent
+  - admission-agent
+
+# V3 Swarm Configuration
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 30000
+
+# Routing Intelligence
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m  # Fast for most LTE parameter tasks
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: false  # LTE configs require context understanding
+  priority_score: 75
+  routing_hints:
+    - "Use for EUTRAN, PRACH, PUCCH, carrier aggregation"
+    - "Route PDSCH/PDCCH optimization here"
+    - "Handle LTE-specific handover optimization"
+    - "Coordinate with 5g-nr-agent for EN-DC"
+
+# Memory Integration
+memory_config:
+  namespace: lte-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 50
+
+# Coordination
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 30
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+# Context Files
+context_files:
+  identity: src/zeroclaw/agents/4g-lte/IDENTITY.md
+  features: src/zeroclaw/agents/4g-lte/context/features.md
+  knowledge: src/zeroclaw/agents/4g-lte/context/4g-lte-knowledge.json
+  kpis: src/zeroclaw/agents/4g-lte/context/kpis.md
+  parameters: src/zeroclaw/agents/4g-lte/context/parameters.md
+  counters: src/zeroclaw/agents/4g-lte/context/counters.md
+  playbooks: src/zeroclaw/agents/4g-lte/context/playbooks.md
+  reference: src/zeroclaw/agents/4g-lte/context/reference.md
+
+# Performance Targets
+performance:
+  response_time_p50_ms: 250
+  response_time_p95_ms: 500
+  accuracy_target: 0.92
+  confidence_threshold: 0.85
+
+# SQLite RAG Configuration (ADR-030)
+# Uses SQLite-backed embedding store instead of JSON loading
+sqlite_rag:
+  enabled: true
+  agent_id: "4g-lte"  # Maps to agent_feature_access table
+  db_path: ".claude/skills/elex-ran-features/data/knowledge.db"
+  embeddings_db: ".claude/skills/elex-ran-features/references/embeddings.db"
+
+  # Search configuration
+  search:
+    default_limit: 10
+    min_similarity: 0.3
+    use_cache: true
+    cache_ttl_seconds: 300
+
+  # Context retrieval settings
+  context:
+    max_features: 5
+    max_parameters: 15
+    include_counters: true
+    include_kpis: true
+    max_context_tokens: 2000
+
+  # Technology filters (from agents table)
+  access_technologies:
+    - LTE
+
+  # Categories this agent specializes in
+  categories:
+    - "Radio Resource Management"
+    - "Coverage & Capacity"
+    - "Mobility & Handover"
+    - "MIMO & Antenna"
+    - "Energy Saving"
+    - "Carrier Aggregation"
+    - "QoS & Scheduling"
+
+  # Loader module path
+  loader:
+    module: ".claude/skills/elex-ran-features/loader/agent_sqlite_loader.py"
+    class: "AgentContextLoader"
+    factory: "get_4g_lte_loader"
+
+  # Performance targets for SQLite operations
+  performance:
+    vector_search_p95_ms: 50
+    parameter_lookup_p95_ms: 10
+    context_retrieval_p95_ms: 100
+    cache_hit_rate_target: 0.80

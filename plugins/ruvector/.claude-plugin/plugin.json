@@ -1,0 +1,40 @@
+{
+  "name": "ruvector",
+  "description": "High-performance vector database ecosystem with 45+ npm packages and RVF (RuVector Format) cognitive containers: single-file deployment primitive that replaces vector DBs, model registries, container images, graph stores, and audit logs. HNSW indexing (50k+ inserts/sec), GNN knowledge graphs, self-learning hooks (Q-learning, semantic memory), multi-provider LLM orchestration with SONA/LoRA/EWC++, FastGRNN neural routing (10us), 39 attention mechanisms, distributed Raft consensus, edge/WASM runtimes, neuromorphic computing (spiking nets, HDC, BTSP), multi-agent coordination with CRDT economy, PostgreSQL vector extension, and self-booting cognitive containers with witness chains.",
+  "version": "1.1.0",
+  "author": {
+    "name": "ruvnet",
+    "url": "https://github.com/ruvnet/ruvector"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/ruvnet/ruvector",
+  "homepage": "https://github.com/ruvnet/ruvector",
+  "keywords": [
+    "ruvector",
+    "rvf",
+    "cognitive-container",
+    "vector-database",
+    "hnsw",
+    "graph-neural-networks",
+    "self-learning",
+    "llm-orchestration",
+    "sona",
+    "attention-mechanisms",
+    "distributed-systems",
+    "raft-consensus",
+    "edge-wasm",
+    "neuromorphic",
+    "agent-coordination",
+    "postgresql-extension",
+    "rust-napi",
+    "cow-branching",
+    "witness-chain",
+    "self-booting",
+    "microkernel",
+    "ebpf",
+    "post-quantum-crypto",
+    "tee-attestation",
+    "microlora",
+    "deployment-primitive"
+  ]
+}

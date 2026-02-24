@@ -1,0 +1,35 @@
+{
+  "name": "@wasmai/local-inf",
+  "version": "1.0.0",
+  "description": "Local inference skill for WASM-AI platform - manage local AI models in Incus sandboxes",
+  "main": "bin/cli.js",
+  "bin": {
+    "local-inf": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "jest",
+    "lint": "eslint bin/"
+  },
+  "keywords": [
+    "local",
+    "inference",
+    "ai",
+    "ollama",
+    "llama.cpp",
+    "wasm",
+    "incus",
+    "sandbox"
+  ],
+  "author": "WASM-AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "ora": "^5.4.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "type": "module"
+}

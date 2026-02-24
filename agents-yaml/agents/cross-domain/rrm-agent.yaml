@@ -1,0 +1,386 @@
+name: rrm-agent
+version: 3.0.0
+description: Radio Resource Management specialist for load balancing and admission control
+
+# Agent Metadata
+domain: RRM
+technology: ALL
+agent_type: specialist
+role: resource-management
+
+capabilities:
+  # Load Balancing Optimization
+  - Intra-frequency load balancing (LTE/NR)
+  - Inter-frequency load balancing (LTE/NR)
+  - Cross-layer load balancing (LTE-to-NR)
+  - Load-based traffic steering
+  - Preference-based traffic steering with load factors
+  - Load measurement and prediction
+  - Cell load trending and forecasting
+  - Predictive load-based HO
+
+  # Admission Control Tuning
+  - RRC connection admission thresholds
+  - Bearer (E-RAB/DRB) admission control
+  - GBR bearer admission policies
+  - Non-GBR bearer resource allocation
+  - Load-dependent admission
+  - Congestion-based admission decisions
+  - Resource guarantee enforcement
+  - Admission success rate optimization
+
+  # Resource Allocation Strategies
+  - Physical Resource Block (PRB) allocation
+  - Frequency-selective scheduling
+  - Time-selective scheduling
+  - User fairness algorithms
+  - Priority-based allocation (GBR > Non-GBR)
+  - Service-type-aware allocation
+  - Proportional fair scheduling
+  - Maximum throughput scheduling
+  - Maximum C/I scheduling
+
+  # QoS Scheduling & Prioritization
+  - QCI-based priority queuing
+  - QoS class identifier handling (QCI 1-9)
+  - Bearer priority levels (PL 1-16)
+  - Service data flow handling
+  - GBR resource scheduling
+  - Delay-critical packet scheduling
+  - Non-GBR packet scheduling
+  - HARQ priority optimization
+
+  # PRB Utilization Optimization
+  - PRB utilization measurement
+  - DL PRB utilization analysis
+  - UL PRB utilization analysis
+  - Resource efficiency metrics
+  - Peak-to-average ratio optimization
+  - Spectral efficiency improvement
+  - Underutilized frequency tuning
+
+  # Inter-Frequency Load Balancing (MLB)
+  - MLB trigger conditions
+  - MLB candidate cell selection
+  - Handover margin optimization for MLB
+  - Inter-frequency measurement configuration
+  - Load-aware frequency selection
+  - Capacity-based frequency steering
+  - Frequency congestion detection
+
+  # Mobility Load Balancing (MLB)
+  - MLB across same/different frequencies
+  - NFL (Neighbor Frequency List) optimization
+  - Load-based handover triggering
+  - MLB overload thresholds
+  - MLB margin tuning
+  - Load-dependent TTT adjustment
+
+  # Access Control & Barring
+  - Access Class Barring (ACB) tuning
+  - ACB triggering conditions
+  - Barring rates optimization
+  - Emergency call handling
+  - Priority access service (PAS)
+  - Multimedia Priority Service (MMPS)
+  - Disaster relief and recovery
+
+  # Resource Management Policies
+  - Static vs. dynamic resource allocation
+  - Time-of-day policies
+  - Event-based policies
+  - Load thresholds and hysteresis
+  - Overload protection mechanisms
+  - Underload optimization
+  - Seasonal policy adjustments
+
+  # Advanced RRM Features
+  - Interference management (CoMP, ICIC)
+  - Downlink power allocation (PA/PB optimization)
+  - Uplink power control
+  - Transmit power spectral density management
+  - Flexible bandwidth utilization
+  - CA-aware resource allocation
+  - Dual connectivity resource split
+
+  # Machine Learning Integration
+  - Load prediction models
+  - Traffic pattern learning
+  - Handover success prediction
+  - Resource demand forecasting
+  - Anomaly detection in resource usage
+  - Optimal policy learning
+
+  # Performance Measurement & Trending
+  - Resource utilization KPI tracking
+  - Trend analysis and prediction
+  - Bottleneck identification
+  - Capacity planning support
+  - Performance degradation alerts
+
+patterns:
+  - /load.*balance|load.*balanc|MLB/i
+  - /admission.*control|CAC|admission.*decision/i
+  - /RRM|radio.*resource.*mgmt/i
+  - /PRB|prb|physical.*resource.*block/i
+  - /resource.*alloc|resource.*management|resource.*grant/i
+  - /QoS|quality.*service|QCI/i
+  - /GBR|gbr|guaranteed.*bit.*rate/i
+  - /Non-GBR|non-gbr|best.*effort/i
+  - /ACB|access.*class.*barring/i
+  - /scheduler|scheduling|proportional.*fair/i
+  - /HARQ|feedback|retransmission/i
+  - /interference.*manage|power.*alloc/i
+  - /CoMP|ICIC|coordin.*multipoint/i
+
+autonomy_threshold: 85
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - RRMExperts
+  - ResourceOptimization
+  - CapacityPlanning
+
+memory_namespace: rrm-patterns
+
+kpi_focus:
+  # PRB Utilization
+  - pmPrbUtilDl
+  - pmPrbUtilUl
+  - pmPrbUtilTotal
+  - pmPrbUtilTrend
+
+  # Active UE Metrics
+  - pmActiveUeDl
+  - pmActiveUeUl
+  - pmActiveUeTotal
+  - pmUeLoadDistribution
+
+  # Load Balancing
+  - pmLoadBalanceSucc
+  - pmLoadBalanceAttempts
+  - pmLoadBalanceFail
+  - pmLoadImbalance
+
+  # Admission Control
+  - pmAdmissionAccept
+  - pmAdmissionRej
+  - pmAdmissionRate
+  - pmAdmissionFailRate
+
+  # Bearer Metrics
+  - pmErabEstabSucc
+  - pmErabEstabFail
+  - pmDrbEstabSucc
+  - pmDrbEstabFail
+  - pmGbrBearerCount
+  - pmNonGbrBearerCount
+
+  # Resource Allocation
+  - pmSchedulerActivity
+  - pmDataVolumeDl
+  - pmDataVolumeUl
+  - pmPriorityAllocationSuccess
+
+  # Scheduling Efficiency
+  - pmSpectralEfficiency
+  - pmResourceEfficiency
+  - pmThroughputDl
+  - pmThroughputUl
+
+  # Overload Indicators
+  - pmCongestionTime
+  - pmCongestionLevel
+  - pmOverloadIndicators
+  - pmLoadFraction
+
+  # Access Control
+  - pmAcbActivation
+  - pmAcbRate
+  - pmEmergencyCallSuccess
+
+expertise_level: expert
+specialization:
+  - load_balancing
+  - admission_control
+  - resource_scheduling
+  - qos_enforcement
+  - performance_optimization
+
+core_algorithms:
+  - load_distribution: "Weighted fair queuing with load prediction"
+  - admission_decision: "Threshold-based + Load-aware + Congestion-based"
+  - resource_allocation: "Priority queuing + Service-type aware + Fairness"
+  - scheduling: "Proportional fairness + QoS guarantee + Load consideration"
+  - interference_management: "CoMP + ICIC + Power allocation"
+
+thresholds_and_parameters:
+  - prb_util_high: "80-90%"
+  - prb_util_overload: ">90%"
+  - congestion_threshold: "80% PRB utilization"
+  - acb_trigger: ">95% load"
+  - load_imbalance_critical: ">20% difference between cells"
+  - admission_margin: "10-15% capacity reserved"
+
+performance_targets:
+  - prb_utilization_target: "75-85%"
+  - load_balance_variance: "<5%"
+  - admission_success_rate: ">98%"
+  - resource_efficiency: ">90%"
+  - spectral_efficiency_improvement: ">20%"
+  - congestion_avoidance: ">95% cells <80% util"
+
+# PRB Congestion Tuning — Concrete parameter ranges for DL/UL PRB congestion scenarios
+# The LLM MUST propose values within these ranges; do NOT return param names without values.
+prb_congestion_tuning:
+  dl_prb_congestion:
+    description: "Reduce DL PRB utilization during busy hour by adjusting load thresholds, scheduling, and traffic steering"
+    parameters:
+      - name: dlPrbLoadThreshold
+        mo_class: EUtranCellFDD
+        range: "50..95"
+        unit: "%"
+        default: 80
+        recommended_congestion: "60-75"
+        rationale: "Lower threshold triggers load balancing earlier to offload congested cell"
+      - name: dlLoadBalancingActive
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_congestion: 1
+        rationale: "Enable DL load balancing to steer traffic to less loaded neighbors"
+      - name: dlSchedulerDynamicBwAllocationEnabled
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_congestion: 1
+        rationale: "Enable dynamic bandwidth allocation to improve DL scheduling efficiency"
+      - name: dlMaxWaitingTime
+        mo_class: EUtranCellFDD
+        range: "1..50"
+        unit: "ms"
+        default: 20
+        recommended_congestion: "10-15"
+        rationale: "Reduce max waiting time to prioritize scheduling fairness during congestion"
+      - name: diffCellLoadThresholdDl
+        mo_class: EUtranCellFDD
+        range: "0..30"
+        unit: "%"
+        default: 10
+        recommended_congestion: "5-8"
+        rationale: "Lower load differential threshold to trigger inter-cell MLB earlier"
+      - name: dlCompositLoadThreshold
+        mo_class: EUtranCellFDD
+        range: "50..100"
+        unit: "%"
+        default: 90
+        recommended_congestion: "70-80"
+        rationale: "Lower composite load threshold for earlier congestion detection"
+  ul_prb_congestion:
+    description: "Reduce UL PRB utilization by adjusting UL scheduling and power control"
+    parameters:
+      - name: ulPrbLoadThreshold
+        mo_class: EUtranCellFDD
+        range: "50..95"
+        unit: "%"
+        default: 80
+        recommended_congestion: "60-75"
+      - name: ulLoadBalancingActive
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_congestion: 1
+  scheduling_optimization:
+    description: "Tune scheduler parameters to improve resource efficiency under load"
+    parameters:
+      - name: dlMcsRestriction
+        mo_class: EUtranCellFDD
+        range: "0..28"
+        default: 28
+        recommended_congestion: "20-24"
+        rationale: "Restrict max MCS to reduce retransmissions and improve PRB efficiency"
+      - name: maxNumHarqDlReTx
+        mo_class: EUtranCellFDD
+        range: "0..8"
+        default: 3
+        recommended_congestion: "2-3"
+        rationale: "Limit HARQ retransmissions to free PRBs under congestion"
+
+fallback_agents:
+  - loadbalance-agent
+  - admission-agent
+  - mobility-agent
+
+# V3 Swarm Configuration
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 12
+  task_timeout_ms: 25000
+
+# Routing Intelligence
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m  # RRM cross-domain resource management
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true  # Simple PRB threshold adjustments can use booster
+  priority_score: 70
+  routing_hints:
+    - "Use for load balancing, PRB utilization, admission control"
+    - "Route QoS scheduling and resource allocation here"
+    - "Handle cross-technology RRM (LTE+NR)"
+    - "Coordinate with 4g-lte-agent and 5g-nr-agent for MLB"
+    - "Expert in ACB, congestion management, capacity planning"
+
+# Memory Integration
+memory_config:
+  namespace: rrm-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+# Coordination
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+# Context Files
+context_files:
+  identity: src/zeroclaw/agents/rrm/IDENTITY.md
+  features: src/zeroclaw/agents/rrm/context/features.md
+  knowledge: src/zeroclaw/agents/rrm/context/rrm-knowledge.json
+  kpis: src/zeroclaw/agents/rrm/context/kpis.md
+  parameters: src/zeroclaw/agents/rrm/context/parameters.md
+  counters: src/zeroclaw/agents/rrm/context/counters.md
+  playbooks: src/zeroclaw/agents/rrm/context/playbooks.md
+  reference: src/zeroclaw/agents/rrm/context/reference.md
+  pilot_results: src/zeroclaw/agents/rrm/context/pilot-results.json
+
+# Performance Targets
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.94
+  confidence_threshold: 0.85

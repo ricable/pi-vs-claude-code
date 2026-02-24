@@ -94,6 +94,53 @@ mega-swarm:
     - agent: documenter
       prompt: "Document final solution for: $ORIGINAL"
 
+# Claude-Flow swarm chains (orchestrated via cf_swarm_start tool)
+cf-dev-cycle:
+  description: "Claude-Flow development swarm — plan, code, review, test with distributed coordination"
+  steps:
+    - agent: planner
+      prompt: "Architect the solution for: $INPUT\nThis will be executed by a claude-flow development swarm."
+    - agent: coder
+      prompt: "Implement based on this architecture:\n\n$INPUT"
+    - agent: reviewer
+      prompt: "Review this implementation for correctness, security, and style:\n\n$INPUT"
+    - agent: tester
+      prompt: "Create comprehensive tests for:\n\n$INPUT\n\nOriginal objective: $ORIGINAL"
+
+cf-research-synthesis:
+  description: "Claude-Flow research swarm — gather, analyze, synthesize findings"
+  steps:
+    - agent: scout
+      prompt: "Explore and gather information about: $INPUT"
+    - agent: researcher
+      prompt: "Analyze and cross-reference these findings:\n\n$INPUT\n\nOriginal query: $ORIGINAL"
+    - agent: planner
+      prompt: "Synthesize a structured report from this research:\n\n$INPUT\n\nOriginal query: $ORIGINAL"
+
+cf-security-audit:
+  description: "Claude-Flow testing swarm — security audit with red-team review"
+  steps:
+    - agent: scout
+      prompt: "Map the attack surface and identify security-relevant code: $INPUT"
+    - agent: red-team
+      prompt: "Perform adversarial security analysis on:\n\n$INPUT\n\nOriginal scope: $ORIGINAL"
+    - agent: tester
+      prompt: "Create security test cases based on this analysis:\n\n$INPUT\n\nOriginal scope: $ORIGINAL"
+    - agent: reviewer
+      prompt: "Final security review — validate findings and prioritize remediation:\n\n$INPUT"
+
+cf-optimize:
+  description: "Claude-Flow optimization swarm — profile, refactor, validate"
+  steps:
+    - agent: scout
+      prompt: "Profile and identify performance bottlenecks in: $INPUT"
+    - agent: coder
+      prompt: "Optimize the bottlenecks identified:\n\n$INPUT\n\nOriginal target: $ORIGINAL"
+    - agent: tester
+      prompt: "Benchmark before/after and validate no regressions:\n\n$INPUT\n\nOriginal target: $ORIGINAL"
+    - agent: reviewer
+      prompt: "Review optimization for correctness and measurable improvement:\n\n$INPUT"
+
 telecom-analysis:
   description: "Telecom RAN analysis chain"
   steps:
@@ -103,3 +150,17 @@ telecom-analysis:
       prompt: "Throughput optimization for: $ORIGINAL (context: $INPUT)"
     - agent: learning
       prompt: "Extract learnings from analysis: $ORIGINAL"
+
+swarm-demo:
+  description: "10-agent federated learning demo with RVF consensus convergence"
+  steps:
+    - agent: planner
+      prompt: "Create architecture spec for: $INPUT"
+    - agent: researcher
+      prompt: "Research best patterns for: $ORIGINAL (spec: $INPUT)"
+    - agent: coder
+      prompt: "Implement based on spec and research: $ORIGINAL (context: $INPUT)"
+    - agent: reviewer
+      prompt: "Review implementation for: $ORIGINAL (code: $INPUT)"
+    - agent: tester
+      prompt: "Create tests for: $ORIGINAL (implementation: $INPUT)"

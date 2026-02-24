@@ -1,0 +1,202 @@
+name: neighbor-agent
+version: 3.0.0
+description: ANR, PCI management, and neighbor list optimization specialist
+
+domain: Neighbor
+technology: ALL
+agent_type: specialist
+role: neighbor-management-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # ANR Optimization
+  - Automatic Neighbor Relation management
+  - ANR measurement report configuration
+  - Neighbor relation addition policy
+  - ANR removal policy tuning
+  - Missing neighbor detection
+  - Unnecessary neighbor pruning
+
+  # PCI Management
+  - Physical Cell ID collision detection
+  - PCI confusion resolution
+  - PCI planning optimization
+  - PCI mod-3/mod-6 conflict avoidance
+
+  # Neighbor List Management
+  - Max neighbor list size optimization
+  - Neighbor priority ordering
+  - Inter-RAT neighbor configuration
+  - Inter-frequency neighbor optimization
+  - Stale neighbor removal
+  - Neighbor blacklist management
+
+  # Handover Neighbor Impact
+  - Handover success per neighbor pair
+  - Missing neighbor-caused HO failures
+  - Neighbor-pair ping-pong analysis
+
+patterns:
+  - /ANR|automatic.*neighbor|neighbor.*relation/i
+  - /PCI|physical.*cell.*id|pci.*collis/i
+  - /neighbor.*list|neighbor.*optim|neighbor.*manage/i
+  - /missing.*neighbor|stale.*neighbor|neighbor.*prun/i
+  - /pci.*confus|pci.*conflict|mod-3|mod-6/i
+  - /inter-RAT.*neighbor|inter-freq.*neighbor/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - MobilityExperts
+  - NeighborManagement
+
+memory_namespace: neighbor-patterns
+
+kpi_focus:
+  # ANR
+  - pmAnrNeighborAdd
+  - pmAnrNeighborRemove
+  - pmAnrMeasReportRecvd
+
+  # PCI
+  - pmPciCollision
+  - pmPciConfusion
+
+  # Handover (neighbor-related)
+  - pmHoExeSucc
+  - pmHoExeAtt
+  - pmHoFailMissingNeighbor
+  - pmHoFailWrongCell
+
+  # Neighbor List
+  - pmNeighborListSize
+  - pmNeighborRelCount
+
+  # RLF (secondary)
+  - pmRadioLinkFailure
+  - pmRrcReEstabAtt
+
+expertise_level: expert
+specialization:
+  - anr_optimization
+  - pci_management
+  - neighbor_list_tuning
+  - neighbor_handover_analysis
+
+# Neighbor Tuning -- Concrete parameter ranges
+anr_optimization:
+  description: "ANR configuration for automatic neighbor discovery and maintenance"
+  parameters:
+    - name: anrEnabled
+      mo_class: EUtranCellRelation
+      range: "0..1"
+      type: boolean
+      default: 1
+      recommended: 1
+      rationale: "Enable ANR for automatic neighbor discovery. Disable only in static deployments."
+    - name: anrMeasReportAmount
+      mo_class: AnrFunction
+      range: "1..16"
+      default: 4
+      recommended: "4-8"
+      rationale: "Number of measurement reports before ANR adds a neighbor. Higher = more confidence, slower detection."
+    - name: maxNoOfNeighbors
+      mo_class: EUtranCellFDD
+      range: "16..128"
+      default: 32
+      recommended: "32-64"
+      rationale: "Max neighbors in cell relation list. Too low = missing neighbors; too high = measurement overhead."
+    - name: anrRemoveIfNoActivity
+      mo_class: AnrFunction
+      range: "1..168"
+      unit: "hours"
+      default: 24
+      recommended: "24-72"
+      rationale: "Remove neighbors with no HO activity for this duration."
+
+pci_management:
+  description: "PCI collision and confusion detection and resolution"
+  parameters:
+    - name: pciDetectionEnabled
+      mo_class: AnrFunction
+      range: "0..1"
+      type: boolean
+      default: 1
+      recommended: 1
+      rationale: "Enable automatic PCI collision/confusion detection."
+    - name: pciConflictDetectionPeriod
+      mo_class: AnrFunction
+      range: "1..24"
+      unit: "hours"
+      default: 6
+      recommended: "4-8"
+      rationale: "Evaluation window for PCI conflict detection."
+
+algorithms:
+  - neighbor_quality: "HO success rate per neighbor pair + ANR activity analysis"
+  - pci_analysis: "PCI collision matrix + mod-3/mod-6 adjacency check"
+  - neighbor_pruning: "Activity-based scoring + distance estimation for list optimization"
+
+performance_targets:
+  - missing_neighbor_rate: "<1% HO failures due to missing neighbors"
+  - pci_collision: "0 PCI collisions in serving area"
+  - neighbor_list_health: ">90% of neighbors with recent HO activity"
+  - anr_detection_time: "<60min for new neighbor detection"
+
+fallback_agents:
+  - mobility-agent
+  - rrm-agent
+  - coverage-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 50
+  routing_hints:
+    - "Use for ANR and neighbor list optimization"
+    - "Route PCI collision/confusion here"
+    - "Handle missing neighbor detection"
+    - "Coordinate with mobility-agent and coverage-agent"
+
+memory_config:
+  namespace: neighbor-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.80

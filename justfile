@@ -95,6 +95,10 @@ ext-theme-cycler:
 ext-orchestration:
     pi -e extensions/orchestration.ts
 
+# 18b. Provider Router: TinyDancer neural routing + pi-ai model providers
+ext-provider-router:
+    pi -e extensions/provider-router.ts
+
 # 19. Learning: AgentDB + ReasoningBank + SONA self-learning
 ext-learning:
     pi -e extensions/learning.ts
@@ -110,6 +114,14 @@ ext-backend-team:
 # 22. Telecom team: orchestration + learning + agent-team for telecom analysis
 ext-telecom:
     pi -e extensions/orchestration.ts -e extensions/learning.ts -e extensions/agent-team.ts
+
+# 24. Swarm demo: 10 federated agents with RVF consensus
+ext-swarm-demo:
+    pi -e extensions/swarm-demo.ts -e extensions/learning.ts
+
+# 25. Full swarm demo: all extensions combined
+ext-swarm-full:
+    pi -e extensions/swarm-demo.ts -e extensions/orchestration.ts -e extensions/learning.ts -e extensions/agent-team.ts
 
 # 23. Sync agents: mirror .pi/agents → .claude/agents
 sync-agents:

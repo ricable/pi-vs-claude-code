@@ -1,0 +1,264 @@
+name: energy-agent
+version: 3.0.0
+description: Energy saving and power consumption optimization specialist
+
+domain: Energy
+technology: ALL
+agent_type: specialist
+role: energy-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # Energy Saving State (ESS)
+  - Energy Saving State activation and deactivation
+  - Low-load threshold configuration for ESS
+  - Cell barring during energy saving
+  - ESS scheduling (time-of-day policies)
+  - ESS impact assessment on coverage and capacity
+  - Gradual ESS activation strategies
+
+  # MIMO Sleep
+  - MIMO sleep mode activation
+  - MIMO sleep opportunity time optimization
+  - Antenna branch shutdown scheduling
+  - MIMO sleep threshold configuration
+  - Sleep-to-active transition tuning
+  - MIMO sleep impact on throughput
+
+  # Carrier Shutdown
+  - Carrier shutdown during low traffic
+  - Multi-carrier energy management
+  - Primary vs secondary carrier shutdown policies
+  - Carrier wake-up trigger configuration
+  - Inter-frequency traffic steering before shutdown
+
+  # Symbol/Slot Shutdown
+  - DTX (Discontinuous Transmission) optimization
+  - DRX (Discontinuous Reception) tuning for energy
+  - Symbol-level power shutdown
+  - Slot blanking configuration
+  - Micro-sleep activation
+
+  # Power Amplifier Optimization
+  - PA efficiency optimization
+  - PA back-off tuning
+  - Load-adaptive power reduction
+  - Max power capping during low load
+  - Digital pre-distortion tuning
+
+  # Cell-Level Energy Management
+  - Cell sleep mode configuration
+  - Capacity-booster cell shutdown
+  - Coverage layer vs capacity layer management
+  - Wake-up signal configuration
+  - Paging-triggered cell activation
+
+  # Network-Level Strategies
+  - Site-level energy optimization
+  - Cluster-level energy coordination
+  - Multi-technology energy management (LTE+NR)
+  - Renewable energy integration policies
+  - Grid power optimization
+
+  # Monitoring and Reporting
+  - Energy consumption counter tracking
+  - Energy efficiency KPI computation
+  - Traffic-to-energy ratio analysis
+  - Energy saving gain measurement
+  - Environmental impact reporting
+
+patterns:
+  - /energy.*sav|energy.*optim|power.*sav/i
+  - /ESS|energy.*state|low.*load.*thresh/i
+  - /MIMO.*sleep|antenna.*sleep|branch.*shutdown/i
+  - /carrier.*shutdown|cell.*sleep|cell.*bar/i
+  - /DTX|DRX|discontinuous/i
+  - /power.*consum|energy.*consum/i
+  - /low.*traffic|off.*peak|night.*mode/i
+  - /PA.*efficien|power.*amplifier/i
+  - /green|carbon|renewable/i
+  - /wake.*up|activation.*trigger/i
+
+autonomy_threshold: 75
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - EnergyExperts
+  - GreenNetwork
+  - CapacityManagement
+
+memory_namespace: energy-patterns
+
+kpi_focus:
+  # Energy Consumption
+  - pmEnergyConsumption
+  - pmConsumedEnergy
+  - pmConsumedEnergyAccumulated
+
+  # MIMO Sleep
+  - pmMimoSleepTime
+  - pmMimoSleepTimeDistr
+  - pmMimoSleepOppTime
+
+  # Cell Availability
+  - pmCellDowntimeAuto
+  - pmCellDowntimeMan
+  - pmCellAvailability
+
+  # Connection Establishment (ESS impact)
+  - pmRrcConnEstabAtt
+  - pmRrcConnEstabSucc
+  - pmRrcConnEstabFail
+
+  # Traffic Volume
+  - pmRadioThpVolDl
+  - pmRadioThpVolUl
+  - pmActiveUeDlMax
+
+  # Power
+  - pmTxPowerDl
+  - pmTransmittedCarrierPowerDl
+
+expertise_level: advanced
+specialization:
+  - energy_saving_state
+  - mimo_sleep
+  - carrier_shutdown
+  - load_adaptive_power
+  - network_energy_efficiency
+
+# Energy Saving Tuning — Concrete parameter ranges
+energy_saving_tuning:
+  ess_activation:
+    description: "Activate energy saving features during low-traffic periods"
+    parameters:
+      - name: energySavingState
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_saving: 1
+        rationale: "Enable energy saving state to reduce power consumption during low traffic"
+      - name: essLowLoadThreshold
+        mo_class: EUtranCellFDD
+        range: "0..100"
+        unit: "%"
+        default: 20
+        recommended_saving: "10-25"
+        rationale: "PRB utilization threshold below which ESS activates. Lower = more aggressive savings, higher = safer coverage."
+      - name: essCellBarActive
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_saving: 0
+        rationale: "Cell barring during ESS. Only enable for capacity-layer cells, never for coverage-layer."
+      - name: essTimerDuration
+        mo_class: EUtranCellFDD
+        range: "1..120"
+        unit: "minutes"
+        default: 30
+        recommended_saving: "15-60"
+        rationale: "Duration to remain in ESS before re-evaluation. Shorter = more reactive, longer = more stable."
+  mimo_sleep:
+    description: "Enable MIMO sleep to power down unused antenna branches"
+    parameters:
+      - name: mimoSleepFunction
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_saving: 1
+        rationale: "Enable MIMO sleep to shut down unused TX branches. Saves 10-20% power during low load."
+      - name: mimoSleepThreshold
+        mo_class: EUtranCellFDD
+        range: "0..100"
+        unit: "%"
+        default: 30
+        recommended_saving: "20-40"
+        rationale: "PRB utilization below which MIMO branches are powered down"
+  carrier_shutdown:
+    description: "Shut down capacity-layer carriers during off-peak hours"
+    parameters:
+      - name: capacityCarrierShutdown
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_saving: 1
+        rationale: "Enable automatic shutdown of secondary carriers when load is low"
+      - name: carrierShutdownLoadThreshold
+        mo_class: EUtranCellFDD
+        range: "0..100"
+        unit: "%"
+        default: 15
+        recommended_saving: "10-20"
+        rationale: "PRB utilization threshold for carrier shutdown trigger"
+
+algorithms:
+  - energy_decision: "Load prediction + Time-of-day + Coverage constraint check"
+  - sleep_activation: "PRB utilization + Active UE count + Traffic trend"
+  - carrier_management: "Multi-carrier load balancing before shutdown + Coverage verification"
+
+performance_targets:
+  - energy_reduction: ">15% power consumption reduction"
+  - cell_availability: ">99.0% during ESS"
+  - rrc_success_rate: ">97% during ESS"
+  - wake_up_latency: "<5s carrier reactivation"
+
+fallback_agents:
+  - coverage-agent
+  - capacity-agent
+  - rrm-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: low
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 55
+  routing_hints:
+    - "Use for energy saving and power consumption optimization"
+    - "Route ESS, MIMO sleep, carrier shutdown here"
+    - "Handle low-traffic period optimization"
+    - "Coordinate with coverage-agent for coverage-safe energy saving"
+
+memory_config:
+  namespace: energy-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.75

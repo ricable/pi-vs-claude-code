@@ -1,0 +1,182 @@
+name: admission-agent
+version: 3.0.0
+description: Admission control and congestion management specialist
+
+domain: AdmissionControl
+technology: ALL
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # Admission Control Thresholds
+  - RRC connection admission control thresholds
+  - E-RAB/DRB admission control tuning
+  - GBR (Guaranteed Bit Rate) bearer admission criteria
+  - Non-GBR bearer admission policies
+  - Admission control algorithm selection
+  - Threshold-based vs. measurement-based admission
+
+  # Congestion Management
+  - Congestion detection and monitoring
+  - Congestion level classification (low/medium/high/critical)
+  - Traffic congestion indicators
+  - Signaling congestion detection
+  - Congestion resolution strategies
+  - Load-dependent transmission control
+
+  # Resource Reservation & Guarantees
+  - GBR resource reservation policies
+  - Reserved capacity management
+  - Resource block reservation for emergencies
+  - QoS class identifier (QCI) handling
+  - AMBR (Aggregate Maximum Bitrate) enforcement
+  - UL/DL resource guarantee enforcement
+
+  # QoS-Based Admission Decisions
+  - QCI-based priority queuing (QCI 1-9)
+  - Standardized vs. non-standardized QCI handling
+  - Resource type allocation (GBR/Delay-critical/Non-GBR)
+  - Priority level enforcement (PL 1-16)
+  - Pre-emption capability handling
+  - Service data flow aggregation
+
+  # Overload Protection
+  - Overload algorithm activation triggers
+  - Overload-triggered rate control
+  - Emergency call handling (eCall/VCC)
+  - Access Class Barring (ACB) integration
+  - Network resource notification (NRN)
+  - Multimedia Priority Service (MMPS) support
+  - Priority access service (PAS) enforcement
+
+  # Load-Based Admission
+  - Cell load measurement and prediction
+  - Load-dependent admission decisions
+  - Traffic type-aware admission
+  - Time-of-day based policies
+  - Seasonal/event-based policies
+  - Machine learning-based prediction
+
+  # Bearer Management
+  - Bearer split/merge optimization
+  - Dual connectivity bearer steering
+  - Bearer activation/deactivation criteria
+  - Bearer re-negotiation triggers
+  - Zero-downtime bearer modification
+
+  # Measurement Integration
+  - Cell-level load measurement interpretation
+  - UE-level load reporting utilization
+  - Uplink timing advance variation
+  - Power headroom interpretation
+  - RLC buffer status integration
+
+  # Advanced Algorithms
+  - Token bucket algorithms for rate control
+  - Weighted fair queuing (WFQ)
+  - Proportional fairness scheduling
+  - Congestion cost calculation
+  - Predictive admission models
+
+patterns:
+  - /admission.*control|CAC|admission.*decision/i
+  - /congestion|congestion.*control/i
+  - /overload|overload.*protection|OLP/i
+  - /resource.*reservation|resource.*guarantee/i
+  - /GBR|gbr|guaranteed.*bit.*rate/i
+  - /Non-GBR|non-gbr|best.*effort/i
+  - /QCI|QoS.*class|quality.*service/i
+  - /AMBR|aggregate.*maximum/i
+  - /load.*dependent|load.*based/i
+  - /bearer.*admission|DRB.*establishment/i
+  - /ACB|access.*class.*barring/i
+  - /emergency.*call|eCall|priority.*service/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - AdmissionExperts
+  - CongestionManagement
+  - ResourceAllocation
+
+memory_namespace: admission-patterns
+
+kpi_focus:
+  # Connection Establishment Failures
+  - pmRrcConnEstabFail
+  - pmRrcConnEstabFailCac
+  - pmRrcConnEstabFailNoRadio
+  - pmRrcConnEstabFailAcb
+
+  # Bearer Establishment Failures
+  - pmErabEstabFail
+  - pmErabEstabFailCong
+  - pmErabEstabFailNoRadio
+  - pmDrbEstabFailCac
+
+  # Congestion Metrics
+  - pmCongestionTime
+  - pmCongestionLevel
+  - pmCongestionEvents
+  - pmLoadFraction
+
+  # Cell Availability
+  - pmCellUnavail
+  - pmCellUnavailCac
+
+  # Admission Metrics
+  - pmAdmissionRej
+  - pmAdmissionAccept
+  - pmAdmissionRate
+  - pmCacRejectCount
+
+  # Resource Utilization
+  - pmPrbUtilDl
+  - pmPrbUtilUl
+  - pmResourceUtilization
+  - pmReservedResourceUsage
+
+  # QoS Metrics
+  - pmQciDistribution
+  - pmGbrBearerCount
+  - pmNonGbrBearerCount
+
+  # Load Prediction
+  - pmPredictedLoad
+  - pmLoadTrend
+
+expertise_level: advanced
+specialization:
+  - congestion_detection
+  - qos_enforcement
+  - overload_protection
+  - resource_guarantee
+  - admission_algorithms
+
+decision_gates:
+  - high_confidence: "95%+ admission patterns"
+  - medium_confidence: "70-95% measurement-based policies"
+  - low_confidence: "<70% predictive models"
+
+thresholds:
+  - admission_rejection_high: 5%
+  - admission_rejection_critical: 10%
+  - congestion_time_threshold: 60s
+  - resource_reservation_percentage: 15-25%
+
+fallback_agents:
+  - rrm-agent
+  - loadbalance-agent
+  - 4g-lte-agent
+  - 5g-nr-agent

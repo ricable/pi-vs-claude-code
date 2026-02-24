@@ -1,0 +1,221 @@
+name: alarm-agent
+version: 3.0.0
+description: Alarm correlation and root cause analysis specialist
+
+domain: AlarmManagement
+technology: ALL
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # Alarm Correlation & Aggregation
+  - Time-window based alarm correlation
+  - Event sequence pattern matching
+  - Temporal dependency analysis
+  - Root cause event identification
+  - Symptom vs. root cause classification
+  - Cascading alarm chain detection
+  - Alarm suppression rule application
+  - Redundant alarm suppression
+  - Event deduplication
+
+  # Root Cause Analysis (RCA)
+  - Single event root cause analysis
+  - Multi-event correlation analysis
+  - Dependency graph analysis
+  - Causal relationship inference
+  - Probable root cause ranking
+  - Confidence scoring for RCA
+  - Root cause event timeline
+  - Contributing factor analysis
+  - Preventive measure recommendation
+
+  # Fault Diagnosis
+  - Hardware fault detection
+  - Software fault diagnosis
+  - Configuration error detection
+  - Resource exhaustion detection
+  - Interface/transmission fault diagnosis
+  - Neighbor cell relationship issues
+  - Synchronization problems
+  - Power/cooling issues
+  - Memory/processing capacity issues
+
+  # Alarm Prioritization
+  - Severity-based prioritization (Critical/Major/Minor/Warning)
+  - Impact-based prioritization
+  - Business impact classification
+  - Customer impact assessment
+  - Service continuity impact
+  - Revenue impact estimation
+  - Dynamic priority adjustment
+  - Context-aware prioritization
+
+  # Historical Pattern Analysis
+  - Historical alarm pattern matching
+  - Recurrent fault detection
+  - Periodic fault patterns
+  - Trend analysis over time
+  - Seasonal patterns
+  - Anomaly detection vs. normal patterns
+  - Machine learning-based pattern recognition
+  - Pattern evolution tracking
+
+  # Cascading Failure Detection
+  - Failure propagation chains
+  - Primary and secondary alarm identification
+  - Cascade prevention triggers
+  - Fault isolation strategies
+  - Failure containment
+  - System stability monitoring
+  - Failure impact prediction
+
+  # Alarm Suppression Strategies
+  - Rule-based suppression
+  - Threshold-based suppression
+  - Time-window suppression
+  - State-dependent suppression
+  - Context-aware suppression
+  - Suppression rule learning
+  - Suppression effectiveness tracking
+
+  # Correlation Algorithms
+  - Event temporal proximity
+  - Event attribute similarity
+  - Topology-based correlation
+  - Service impact correlation
+  - Resource correlation analysis
+  - Network topology-aware correlation
+
+  # Performance & Quality Metrics Integration
+  - KPI degradation correlation
+  - Service quality impact assessment
+  - Performance anomaly detection
+  - Quality of Experience (QoE) correlation
+  - End-to-end service impact
+  - Customer complaint correlation
+
+  # Advanced Features
+  - Probabilistic root cause analysis
+  - Bayesian network-based diagnosis
+  - Machine learning anomaly detection
+  - Time-series anomaly detection
+  - Predictive fault diagnosis
+  - Self-healing recommendations
+  - Automated response recommendations
+
+patterns:
+  - /alarm|alarm.*event/i
+  - /fault|fault.*management|fault.*diagnosis/i
+  - /error|error.*condition/i
+  - /failure|fail|failed/i
+  - /degradation|quality.*degradation/i
+  - /unavailable|unavailability/i
+  - /root.*cause|RCA/i
+  - /correlation|event.*correlation/i
+  - /cascading|cascade.*failure/i
+  - /suppression|suppress/i
+  - /priority|severity/i
+  - /MTTR|downtime|recovery/i
+
+autonomy_threshold: 75
+
+broadcast_groups:
+  - RanSpecialists
+  - AlarmGroup
+  - FaultManagement
+  - NetworkOptimization
+  - DiagnosticsCenter
+
+memory_namespace: alarm-patterns
+
+kpi_focus:
+  # Cell Availability
+  - pmCellUnavail
+  - pmCellDowntime
+  - pmCellAvailability
+  - pmCellRecoveryTime
+
+  # Fault Metrics
+  - pmAlarmCount
+  - pmAlarmRate
+  - pmFaultDuration
+  - pmFaultRecoveryTime
+  - pmFaultFrequency
+
+  # Service Quality
+  - pmServiceAvailability
+  - pmServiceDisruption
+  - pmSLA_Compliance
+
+  # Root Cause Analysis Metrics
+  - pmRootCauseIdentified
+  - pmRootCauseAccuracy
+  - pmRCACompleteTime
+  - pmAutoResolution
+
+  # Maintenance Metrics
+  - pmMTTR  # Mean Time To Repair
+  - pmMTBF  # Mean Time Between Failures
+  - pmMTTD  # Mean Time To Detect
+  - pmRepairSuccessRate
+
+  # Alarm Correlation
+  - pmAlarmsCorrelated
+  - pmCorrelationAccuracy
+  - pmFalsePositiveRate
+  - pmFalseNegativeRate
+
+  # Cascading Failures
+  - pmCascadingFailures
+  - pmCascadePrevention
+  - pmCascadeImpact
+
+  # Suppression Effectiveness
+  - pmAlarmsSupressed
+  - pmSuppressionEffectiveness
+  - pmAlarmReduction
+
+expertise_level: expert
+specialization:
+  - root_cause_analysis
+  - alarm_correlation
+  - fault_diagnosis
+  - cascading_failure_detection
+  - performance_degradation_analysis
+
+algorithms:
+  - correlation: "Temporal + Attribute + Topology-based"
+  - rca: "Bayesian network + ML inference"
+  - anomaly_detection: "Statistical + ML-based"
+  - pattern_matching: "HNSW semantic search"
+
+correlation_parameters:
+  - time_window: "10-300 seconds (configurable)"
+  - confidence_threshold: "60-95% based on pattern strength"
+  - impact_factor: "0-1.0 (business impact weight)"
+
+rca_gates:
+  - high_confidence: ">90% RCA match with historical patterns"
+  - medium_confidence: "70-90% probable root cause"
+  - low_confidence: "<70% requires human investigation"
+
+response_actions:
+  - auto_recover: "High confidence + auto-healing available"
+  - alert_engineer: "Medium confidence + requires approval"
+  - log_investigate: "Low confidence + manual investigation"
+  - predict_similar: "Pattern match + suggest preventive action"
+
+fallback_agents:
+  - learning-agent
+  - enm-api-agent
+  - rrm-agent

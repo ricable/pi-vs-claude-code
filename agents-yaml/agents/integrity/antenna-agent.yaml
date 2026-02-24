@@ -1,0 +1,244 @@
+name: antenna-agent
+version: 3.0.0
+description: Antenna configuration and tilt optimization specialist
+
+domain: Antenna
+technology: ALL
+agent_type: specialist
+role: antenna-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # Electrical Tilt Optimization
+  - Remote Electrical Tilt (RET) optimization
+  - Electrical downtilt tuning for coverage-capacity tradeoff
+  - Per-band tilt configuration
+  - Tilt coordination across co-sited cells
+  - Automatic tilt adjustment algorithms
+  - Tilt impact simulation and prediction
+
+  # Mechanical Tilt
+  - Mechanical tilt recommendations
+  - Combined electrical + mechanical tilt strategy
+  - Azimuth adjustment recommendations
+  - Antenna height considerations
+
+  # Beam Management (NR)
+  - SSB beam direction optimization
+  - CSI-RS beam configuration
+  - Beam width adjustment
+  - Beam sweeping pattern optimization
+  - Digital beamforming weight tuning
+  - Beam-based coverage planning
+  - Beam failure detection and recovery parameters
+
+  # MIMO Configuration
+  - 2T2R / 4T4R / 8T8R configuration
+  - MIMO mode selection (TM1-TM10)
+  - Rank adaptation parameters
+  - MIMO sleep mode configuration
+  - Massive MIMO beam management
+  - Antenna virtualization
+
+  # Antenna Pattern Optimization
+  - Horizontal beamwidth configuration
+  - Vertical beamwidth optimization
+  - Front-to-back ratio considerations
+  - Cross-polar discrimination settings
+  - Antenna gain optimization
+
+  # Coverage-Capacity Tradeoff
+  - Cell footprint adjustment via tilt
+  - Inter-cell interference reduction via downtilt
+  - Capacity gain from aggressive tilting
+  - Coverage extension from uptilt
+  - Neighbor cell impact assessment
+
+  # Site Configuration
+  - Sector antenna alignment
+  - Co-location interference management
+  - Multi-band antenna sharing
+  - Active antenna system (AAS) configuration
+  - Distributed antenna system (DAS) tuning
+
+patterns:
+  - /antenna|tilt|downtilt|uptilt/i
+  - /electrical.*tilt|RET|remote.*electrical/i
+  - /beam.*direct|beam.*width|beam.*config/i
+  - /SSB.*beam|CSI-RS.*beam/i
+  - /MIMO|mimo|4T4R|8T8R|massive/i
+  - /azimuth|elevation|antenna.*pattern/i
+  - /beamform|beam.*sweep|beam.*manage/i
+  - /coverage.*capacity|footprint/i
+  - /antenna.*gain|front.*back/i
+  - /sector|co-location|site.*config/i
+
+autonomy_threshold: 75
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - AntennaExperts
+  - RFOptimization
+  - CoverageOptimization
+
+memory_namespace: antenna-patterns
+
+kpi_focus:
+  # SINR Distribution
+  - pmDlSinrPdcchDistr
+  - pmUlSinrDistr
+  - pmCqiDistr
+
+  # PRB Utilization (tilt-impacted)
+  - pmPrbUtilDl
+  - pmPrbUtilDlDistr
+
+  # Interference (tilt-impacted)
+  - pmRadioRecInterferencePwrPrb10
+  - pmRadioRecInterferencePwrPrb22
+
+  # MIMO
+  - pmMimoSleepOppTime
+  - pmMimoSleepTime
+
+  # Coverage
+  - pmCellDowntimeAuto
+  - pmCellAvailability
+
+  # Active UEs
+  - pmActiveUeDlMax
+  - pmActiveUeDlSum
+
+  # Throughput
+  - pmRadioThpVolDl
+  - pmRadioThpVolUl
+
+expertise_level: expert
+specialization:
+  - electrical_tilt
+  - beam_management
+  - mimo_configuration
+  - coverage_capacity_balance
+  - site_optimization
+
+# Antenna Tilt Tuning — Concrete parameter ranges
+antenna_tilt_tuning:
+  electrical_tilt:
+    description: "Optimize electrical antenna downtilt for coverage-capacity tradeoff"
+    parameters:
+      - name: electricalAntennaTilt
+        mo_class: AntennaUnitGroup
+        range: "0..900"
+        unit: "0.1 degree (0=0°, 900=90°)"
+        default: 60
+        recommended_balance: "20-80"
+        rationale: "Typical range 2-8 degrees. Increase to reduce footprint and inter-cell interference (capacity gain). Decrease to extend coverage."
+      - name: beamDirection
+        mo_class: SectorCarrier
+        range: "0..3599"
+        unit: "0.1 degree"
+        default: 0
+        recommended_balance: "site-specific"
+        rationale: "Horizontal beam steering for NR. Adjust per sector to optimize coverage overlap."
+  mimo_config:
+    description: "MIMO configuration for antenna efficiency"
+    parameters:
+      - name: mimoSleepFunction
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_energy: 1
+        rationale: "Enable MIMO sleep to power down unused antenna branches during low load"
+      - name: dlMimoMode
+        mo_class: EUtranCellFDD
+        range: "1..4"
+        type: enum
+        default: 2
+        recommended_capacity: "3-4"
+        rationale: "1=SISO, 2=TM2 diversity, 3=TM3 open-loop SM, 4=TM4 closed-loop SM. Use TM3/4 for capacity."
+  beam_management:
+    description: "NR beam configuration for coverage and capacity"
+    parameters:
+      - name: ssbFrequencyAutoSelected
+        mo_class: NRCellDU
+        range: "0..1"
+        type: boolean
+        default: 1
+        recommended_coverage: 1
+        rationale: "Auto SSB frequency selection for optimal beam coverage"
+      - name: beamFormingMode
+        mo_class: NRSectorCarrier
+        range: "0..2"
+        type: enum
+        default: 0
+        recommended_coverage: "1-2"
+        rationale: "0=legacy, 1=GoB (Grid of Beams), 2=adaptive. Use GoB or adaptive for 5G coverage optimization."
+
+algorithms:
+  - tilt_optimization: "Minimize inter-cell interference while maintaining coverage threshold"
+  - beam_selection: "Maximum SINR + Load-aware beam assignment"
+  - mimo_mode: "Rank + CQI based MIMO mode adaptation"
+
+performance_targets:
+  - sinr_improvement: ">2 dB at cell edge from tilt optimization"
+  - capacity_gain: ">15% PRB utilization reduction from downtilt"
+  - coverage_target: "RSRP >= -110 dBm at 95th percentile"
+  - interference_reduction: ">3 dB at cell edge"
+
+fallback_agents:
+  - coverage-agent
+  - power-agent
+  - rrm-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: false
+  priority_score: 60
+  routing_hints:
+    - "Use for antenna tilt and beam optimization"
+    - "Route MIMO configuration and beam management here"
+    - "Handle coverage-capacity tradeoff via tilt"
+    - "Coordinate with coverage-agent and power-agent"
+
+memory_config:
+  namespace: antenna-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.80

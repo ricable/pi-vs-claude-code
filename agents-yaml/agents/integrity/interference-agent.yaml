@@ -1,0 +1,266 @@
+name: interference-agent
+version: 3.0.0
+description: Inter-cell interference coordination and ICIC optimization specialist
+
+domain: Interference
+technology: ALL
+agent_type: specialist
+role: interference-management
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # ICIC (Inter-Cell Interference Coordination)
+  - Static ICIC configuration
+  - Dynamic ICIC optimization
+  - Frequency-domain ICIC
+  - Time-domain ICIC (eICIC/FeICIC)
+  - ABS (Almost Blank Subframe) pattern tuning
+  - ICIC power profile configuration
+
+  # Power-Based Interference Control
+  - PA/PB power allocation for interference reduction
+  - Reference signal power coordination
+  - CRS port power management
+  - Downlink power spectral density control
+  - Cell-edge vs cell-center power split
+  - Interference-aware power allocation
+
+  # Uplink Interference Management
+  - UL interference measurement and analysis
+  - UL PUSCH interference reduction
+  - RTWP (Received Total Wideband Power) optimization
+  - UL power control for interference (P0, alpha)
+  - UL IRC (Interference Rejection Combining)
+  - SRS interference coordination
+
+  # CoMP (Coordinated Multi-Point)
+  - CoMP Joint Transmission configuration
+  - CoMP Coordinated Scheduling
+  - CoMP Dynamic Point Selection
+  - CoMP measurement configuration
+  - CoMP clustering optimization
+
+  # Interference Measurement
+  - Interference power per PRB monitoring
+  - Interference distribution analysis
+  - Interference source identification
+  - External interference detection
+  - PIM (Passive Intermodulation) detection
+  - Interference trending and alerting
+
+  # Cell-Edge Interference Mitigation
+  - Cell-edge SINR improvement
+  - Frequency reuse pattern optimization
+  - Soft frequency reuse (SFR)
+  - Fractional frequency reuse (FFR)
+  - Power-based interference zones
+
+  # NR Interference Management
+  - NR CLI (Cross-Link Interference) handling
+  - NR Remote Interference Management (RIM)
+  - NR beam-based interference avoidance
+  - TDD pattern coordination
+  - Dynamic spectrum sharing interference
+
+  # Advanced Interference Features
+  - ML-based interference prediction
+  - Interference cancellation (IC) receiver configuration
+  - NAICS (Network Assisted IC) support
+  - E-NAICS parameters
+  - Interference whitening techniques
+
+patterns:
+  - /interference|ICIC|inter.*cell.*interf/i
+  - /ABS|almost.*blank|eICIC|FeICIC/i
+  - /CoMP|coordinated.*multi.*point/i
+  - /SINR|sinr|signal.*noise/i
+  - /interference.*power|RTWP/i
+  - /frequency.*reuse|SFR|FFR/i
+  - /PA.*PB.*interf|power.*alloc.*interf/i
+  - /PIM|passive.*intermod|external.*interf/i
+  - /IRC|interference.*reject/i
+  - /CLI|cross.*link|remote.*interf/i
+  - /NAICS|interference.*cancel/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - InterferenceExperts
+  - RFOptimization
+  - CoverageOptimization
+
+memory_namespace: interference-patterns
+
+kpi_focus:
+  # DL SINR
+  - pmDlSinrPdcchDistr
+  - pmDlSinrDistr
+
+  # UL SINR
+  - pmUlSinrDistr
+  - pmUlSinrPdcchDistr
+
+  # Interference Power
+  - pmRadioRecInterferencePwrPrb10
+  - pmRadioRecInterferencePwrPrb22
+  - pmRadioRecInterferencePwrPrb34
+  - pmRadioRecInterferencePwrPrb46
+  - pmRadioRecInterferencePwrPrb54
+  - pmRadioRecInterferencePwrPrb62
+  - pmRadioRecInterferencePwrPrb72
+
+  # CQI (interference-impacted)
+  - pmCqiDistr
+
+  # Transmit Power
+  - pmTxPowerDl
+  - pmTransmittedCarrierPowerDl
+
+  # Throughput (interference-impacted)
+  - pmRadioThpVolDl
+  - pmRadioThpVolUl
+  - pmUeThpDlDistr
+
+expertise_level: expert
+specialization:
+  - icic_optimization
+  - power_based_interference
+  - comp_coordination
+  - interference_measurement
+  - cell_edge_sinr
+
+# Interference Tuning — Concrete parameter ranges
+interference_tuning:
+  icic_power_allocation:
+    description: "Reduce inter-cell interference using ICIC power allocation adjustments"
+    parameters:
+      - name: pA
+        mo_class: EUtranCellFDD
+        range: "-6..3"
+        unit: "dB"
+        default: 0
+        recommended_interference: "-3..0"
+        rationale: "Negative PA reduces PDSCH power relative to CRS, lowering inter-cell DL interference"
+      - name: pB
+        mo_class: EUtranCellFDD
+        range: "0..3"
+        type: enum
+        default: 1
+        recommended_interference: "0-1"
+        rationale: "PB controls power ratio on OFDM symbols with/without CRS. PB=0 for uniform power."
+      - name: crsPortCount
+        mo_class: EUtranCellFDD
+        range: "1..4"
+        default: 2
+        recommended_interference: 2
+        rationale: "CRS port count. More ports = more reference signal overhead but better measurement accuracy."
+      - name: dlInterferenceManagementActive
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_interference: 1
+        rationale: "Enable DL interference management for coordinated power allocation"
+  abs_pattern:
+    description: "Configure ABS patterns for eICIC/FeICIC"
+    parameters:
+      - name: absPatternActive
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_interference: 1
+        rationale: "Enable ABS pattern for time-domain ICIC in HetNet deployments"
+      - name: absPercentage
+        mo_class: EUtranCellFDD
+        range: "0..60"
+        unit: "%"
+        default: 0
+        recommended_interference: "10-30"
+        rationale: "Percentage of subframes configured as ABS. Higher = more protection for victim cells, but less macro capacity."
+  ul_interference:
+    description: "Reduce uplink interference through power control"
+    parameters:
+      - name: pZeroNominalPusch
+        mo_class: EUtranCellFDD
+        range: "-126..24"
+        unit: "dBm"
+        default: -96
+        recommended_interference: "-105..-96"
+        rationale: "Lower P0 reduces UL transmit power and inter-cell UL interference"
+      - name: alpha
+        mo_class: EUtranCellFDD
+        range: "0..10"
+        unit: "0.1 (0=0.0, 7=0.7, 8=0.8, 10=1.0)"
+        default: 8
+        recommended_interference: "7-8"
+        rationale: "Fractional path-loss compensation (alpha<1.0) reduces cell-edge UL interference"
+
+algorithms:
+  - interference_assessment: "Per-PRB interference power analysis + SINR distribution"
+  - icic_policy: "Power profile + ABS pattern + Frequency coordination"
+  - comp_decision: "Clustering + Channel quality + Backhaul capacity"
+
+performance_targets:
+  - sinr_improvement: ">3 dB cell-edge SINR improvement"
+  - interference_reduction: ">5 dB interference power reduction at cell edge"
+  - throughput_gain: ">15% cell-edge throughput improvement"
+  - cqi_shift: ">1 CQI bin improvement at cell edge"
+
+fallback_agents:
+  - power-agent
+  - coverage-agent
+  - rrm-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: false
+  priority_score: 65
+  routing_hints:
+    - "Use for ICIC, ABS, and interference management"
+    - "Route PA/PB interference tuning here"
+    - "Handle CoMP and interference coordination"
+    - "Coordinate with power-agent and coverage-agent"
+
+memory_config:
+  namespace: interference-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.80

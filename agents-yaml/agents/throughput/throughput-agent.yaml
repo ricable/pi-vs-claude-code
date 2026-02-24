@@ -1,0 +1,271 @@
+name: throughput-agent
+version: 3.0.0
+description: DL/UL throughput and data rate optimization specialist
+
+domain: Throughput
+technology: ALL
+agent_type: specialist
+role: throughput-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # DL Throughput Optimization
+  - DL PDCP throughput improvement
+  - DL MAC throughput optimization
+  - DL scheduling efficiency
+  - DL resource allocation for throughput
+  - Peak DL throughput maximization
+  - Average DL throughput improvement
+
+  # UL Throughput Optimization
+  - UL PUSCH throughput improvement
+  - UL scheduling optimization
+  - UL grant allocation efficiency
+  - UL resource utilization
+  - UL throughput for VoLTE/VoNR
+
+  # Modulation and Coding
+  - 256QAM DL activation and thresholds
+  - 64QAM UL activation
+  - MCS (Modulation and Coding Scheme) optimization
+  - Adaptive modulation parameters
+  - Code rate optimization
+  - BLER target tuning per MCS
+
+  # MIMO for Throughput
+  - Spatial multiplexing optimization
+  - MIMO rank adaptation
+  - TM3/TM4 mode selection for throughput
+  - Beamforming for throughput gain
+  - 4x4 MIMO utilization
+  - Massive MIMO layer optimization
+
+  # HARQ Optimization
+  - HARQ retransmission policy tuning
+  - Adaptive HARQ timing
+  - HARQ combining efficiency
+  - Max retransmission count optimization
+  - HARQ feedback timing
+
+  # Link Adaptation
+  - Outer-loop link adaptation (OLLA) tuning
+  - CQI-to-MCS mapping optimization
+  - BLER target vs throughput tradeoff
+  - Link adaptation convergence speed
+  - CQI reporting configuration
+
+  # Carrier Aggregation for Throughput
+  - CA activation for throughput boost
+  - Cross-carrier scheduling for throughput
+  - Multi-carrier throughput aggregation
+  - PCell/SCell throughput split optimization
+
+  # Advanced Throughput Features
+  - TTI bundling for UL edge throughput
+  - Semi-persistent scheduling (SPS) tuning
+  - Dynamic scheduling optimization
+  - Buffer status report (BSR) handling
+  - TCP optimization via RAN parameters
+
+patterns:
+  - /throughput|thp|data.*rate/i
+  - /DL.*throughput|UL.*throughput|PDCP.*thp/i
+  - /256QAM|64QAM|modulation|MCS/i
+  - /MIMO.*throughput|spatial.*multiplex|rank/i
+  - /HARQ|retransmission|BLER/i
+  - /link.*adapt|OLLA|outer.*loop/i
+  - /scheduling.*efficien|scheduler.*optim/i
+  - /peak.*rate|average.*rate|user.*thp/i
+  - /TTI.*bundl|SPS|semi.*persistent/i
+  - /spectral.*effic|bps.*Hz/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - ThroughputExperts
+  - CapacityOptimization
+  - QoSManagement
+
+memory_namespace: throughput-patterns
+
+kpi_focus:
+  # DL Throughput
+  - pmUeThpDlDistr
+  - pmUeThpDlMbbFilteredDistr
+  - pmRadioThpVolDl
+  - pmPdcpVolDlDrb
+
+  # UL Throughput
+  - pmUeThpUlDistr
+  - pmRadioThpVolUl
+  - pmPdcpVolUlDrb
+
+  # Modulation
+  - pmMcsDistrDl
+  - pmMcsDistrUl
+  - pm256QamCapableUe
+
+  # MIMO
+  - pmRankDistrDl
+  - pmMimoUsageDl
+
+  # HARQ
+  - pmDlBlerDistr
+  - pmUlBlerDistr
+  - pmHarqRetxDl
+
+  # PRB Efficiency
+  - pmPrbUtilDl
+  - pmPrbUtilUl
+  - pmSpectralEfficiency
+
+  # Scheduling
+  - pmSchedulerActivity
+  - pmPdcchCceUtil
+
+  # CA Throughput
+  - pmCaActivatedDlIcmSum
+  - pmCaScheduledDlSum
+
+expertise_level: expert
+specialization:
+  - dl_throughput
+  - ul_throughput
+  - modulation_optimization
+  - mimo_rank_adaptation
+  - link_adaptation
+
+# Throughput Tuning — Concrete parameter ranges
+throughput_tuning:
+  modulation_optimization:
+    description: "Optimize modulation and coding for maximum throughput"
+    parameters:
+      - name: dl256QamEnabled
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_throughput: 1
+        rationale: "Enable 256QAM DL for up to 33% peak throughput gain on capable UEs"
+      - name: ul64QamEnabled
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_throughput: 1
+        rationale: "Enable 64QAM UL for up to 50% UL peak throughput gain"
+      - name: dlMcsRestriction
+        mo_class: EUtranCellFDD
+        range: "0..28"
+        default: 28
+        recommended_throughput: "26-28"
+        rationale: "Allow highest MCS indices for peak throughput. Only restrict if excessive retransmissions."
+  link_adaptation:
+    description: "Tune link adaptation for throughput vs reliability tradeoff"
+    parameters:
+      - name: olpcBlerTarget
+        mo_class: EUtranCellFDD
+        range: "1..30"
+        unit: "%"
+        default: 10
+        recommended_throughput: "8-12"
+        rationale: "BLER target for outer-loop. Lower = more conservative (reliable); higher = more aggressive (higher throughput)."
+      - name: olpcStepSizeUp
+        mo_class: EUtranCellFDD
+        range: "1..10"
+        unit: "0.1 dB"
+        default: 2
+        recommended_throughput: "1-3"
+        rationale: "MCS up-step size. Larger = faster ramp-up to higher MCS (more throughput), but more volatile."
+      - name: olpcStepSizeDown
+        mo_class: EUtranCellFDD
+        range: "1..10"
+        unit: "0.1 dB"
+        default: 2
+        recommended_throughput: "2-4"
+        rationale: "MCS down-step size on NACK. Larger = faster fallback (more reliable); smaller = sustained throughput."
+  harq_tuning:
+    description: "HARQ retransmission tuning for throughput efficiency"
+    parameters:
+      - name: maxNumHarqDlReTx
+        mo_class: EUtranCellFDD
+        range: "0..8"
+        default: 3
+        recommended_throughput: "3-4"
+        rationale: "Max DL HARQ retransmissions. More retx = higher reliability but burns PRBs; fewer = saves capacity."
+      - name: maxNumHarqUlReTx
+        mo_class: EUtranCellFDD
+        range: "0..8"
+        default: 3
+        recommended_throughput: "3-4"
+        rationale: "Max UL HARQ retransmissions."
+
+algorithms:
+  - throughput_assessment: "MCS distribution + MIMO rank + BLER composite analysis"
+  - modulation_policy: "Channel quality + UE capability + Interference level → MCS selection"
+  - link_adaptation: "OLLA with BLER feedback + traffic type awareness"
+
+performance_targets:
+  - dl_throughput_gain: ">20% median DL user throughput improvement"
+  - ul_throughput_gain: ">15% median UL user throughput improvement"
+  - bler_target: "<10% first transmission BLER"
+  - spectral_efficiency: ">3.0 bps/Hz DL average"
+  - 256qam_utilization: ">30% of capable UEs using 256QAM"
+
+fallback_agents:
+  - ca-agent
+  - rrm-agent
+  - capacity-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 65
+  routing_hints:
+    - "Use for DL/UL throughput optimization"
+    - "Route MCS, MIMO, HARQ tuning here"
+    - "Handle link adaptation and modulation optimization"
+    - "Coordinate with ca-agent and rrm-agent"
+
+memory_config:
+  namespace: throughput-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.80

@@ -1,0 +1,14 @@
+{
+  "name": "huggingface-ai",
+  "description": "Complete HuggingFace ecosystem: CLI operations, dataset creation/preprocessing, model training (SFT/DPO/GRPO via TRL), evaluation benchmarking, experiment tracking (TrackIO), paper publishing, custom tool building, and cloud GPU compute (HF Jobs). Integrates with local-ai-mac-setup for GGUF deployment on Apple Silicon.",
+  "version": "1.0.0",
+  "author": {
+    "name": "rano-k8s-agents",
+    "url": "https://github.com/rano-k8s-agents"
+  },
+  "license": "MIT",
+  "keywords": [
+    "huggingface", "model-training", "trl", "datasets", "evaluation",
+    "gguf-conversion", "trackio", "hf-jobs", "fine-tuning"
+  ]
+}

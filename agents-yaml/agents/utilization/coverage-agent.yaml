@@ -1,0 +1,260 @@
+name: coverage-agent
+version: 3.0.0
+description: Cell-edge coverage and signal quality optimization specialist
+
+domain: Coverage
+technology: ALL
+agent_type: specialist
+role: coverage-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # RF Coverage Optimization
+  - Cell-edge RSRP improvement
+  - RSRQ optimization for cell-edge UEs
+  - DL SINR distribution analysis and improvement
+  - UL SINR distribution optimization
+  - Reference signal power tuning
+  - CRS power boost configuration
+  - Coverage hole detection and mitigation
+
+  # Power Configuration
+  - Reference signal power (PA/PB) tuning
+  - Power offset adjustment for coverage extension
+  - CRS port power management
+  - PDSCH power allocation optimization
+  - PUSCH power control baseline tuning
+  - Max transmit power budget analysis
+
+  # Antenna Configuration
+  - Electrical downtilt optimization for coverage
+  - Mechanical tilt recommendations
+  - Antenna pattern optimization
+  - Beam direction tuning (NR)
+  - SSB beam coverage planning
+  - Antenna gain budget analysis
+
+  # Cell Availability
+  - Cell downtime analysis and reduction
+  - Automatic cell recovery configuration
+  - Cell availability KPI optimization
+  - Self-healing configuration for coverage cells
+  - Coverage-triggered cell barring policies
+
+  # CQI and Channel Quality
+  - CQI distribution analysis
+  - Wideband CQI improvement strategies
+  - Subband CQI exploitation
+  - BLER target optimization
+  - Outer-loop link adaptation tuning
+  - MCS distribution optimization
+
+  # Inter-Cell Interference for Coverage
+  - Cell-edge interference mitigation
+  - ICIC for coverage improvement
+  - CoMP for coverage extension
+  - Power control for inter-cell interference reduction
+  - Frequency-selective interference avoidance
+
+  # Measurement and Reporting
+  - Coverage measurement configuration
+  - Minimization of Drive Tests (MDT)
+  - Coverage gap reporting
+  - RSRP/RSRQ measurement interpretation
+  - Coverage event triggering and analysis
+
+  # Advanced Coverage Features
+  - Carrier aggregation for coverage extension
+  - Relay node placement optimization
+  - Small cell overlay coverage planning
+  - Coverage probability estimation
+  - Path loss model calibration
+
+patterns:
+  - /coverage|cell.*edge|RSRP|RSRQ/i
+  - /signal.*quality|signal.*strength/i
+  - /CQI|channel.*quality|SINR/i
+  - /reference.*signal.*power|PA.*PB/i
+  - /downtilt|tilt|antenna.*config/i
+  - /cell.*availability|cell.*downtime/i
+  - /coverage.*hole|coverage.*gap/i
+  - /BLER|link.*adapt|outer.*loop/i
+  - /MDT|drive.*test|measurement/i
+  - /interference.*coverage|ICIC.*coverage/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - CoverageExperts
+  - RFOptimization
+  - PerformanceOptimization
+
+memory_namespace: coverage-patterns
+
+kpi_focus:
+  # Signal Quality
+  - pmCqiDistr
+  - pmUlSinrDistr
+  - pmDlSinrPdcchDistr
+  - pmRsrpDistr
+  - pmRsrqDistr
+
+  # Cell Availability
+  - pmCellDowntimeAuto
+  - pmCellDowntimeMan
+  - pmCellAvailability
+
+  # Throughput (coverage-impacted)
+  - pmRadioThpVolDl
+  - pmRadioThpVolUl
+  - pmUeThpDlDistr
+
+  # Interference
+  - pmRadioRecInterferencePwrPrb10
+  - pmRadioRecInterferencePwrPrb22
+
+  # Power
+  - pmTxPowerDl
+  - pmTransmittedCarrierPowerDl
+
+  # BLER
+  - pmDlBlerDistr
+  - pmUlBlerDistr
+
+expertise_level: expert
+specialization:
+  - cell_edge_optimization
+  - signal_quality_improvement
+  - rf_power_tuning
+  - antenna_optimization
+  - interference_mitigation
+
+# Coverage Tuning — Concrete parameter ranges for coverage improvement scenarios
+coverage_tuning:
+  rsrp_improvement:
+    description: "Improve cell-edge RSRP through reference signal power and power offset tuning"
+    parameters:
+      - name: referenceSignalPower
+        mo_class: EUtranCellFDD
+        range: "-60..500"
+        unit: "0.1 dBm"
+        default: 186
+        recommended_coverage: "200-250"
+        rationale: "Increase reference signal power to extend cell-edge coverage (18.6 dBm default, up to 25 dBm)"
+      - name: pBPowerOffset
+        mo_class: EUtranCellFDD
+        range: "0..3"
+        type: enum
+        default: 1
+        recommended_coverage: 0
+        rationale: "Set PB=0 (ratio 1) to maximize PDSCH power relative to CRS for better cell-edge throughput"
+      - name: pA
+        mo_class: EUtranCellFDD
+        range: "-6..3"
+        unit: "dB"
+        default: 0
+        recommended_coverage: "0-3"
+        rationale: "Increase PA to boost PDSCH power for cell-edge UEs"
+  rsrq_sinr_improvement:
+    description: "Improve RSRQ and SINR distributions for better cell-edge quality"
+    parameters:
+      - name: dlInterferenceManagementActive
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_coverage: 1
+        rationale: "Enable DL interference management to improve cell-edge SINR"
+      - name: olpcBlerTarget
+        mo_class: EUtranCellFDD
+        range: "1..30"
+        unit: "%"
+        default: 10
+        recommended_coverage: "8-12"
+        rationale: "Tune outer-loop BLER target for cell-edge reliability vs spectral efficiency"
+      - name: crsPortCount
+        mo_class: EUtranCellFDD
+        range: "1..4"
+        default: 2
+        recommended_coverage: 2
+        rationale: "2 CRS ports for diversity gain; 4 only if 4T4R capable"
+  cell_availability:
+    description: "Improve cell availability and reduce automatic downtime"
+    parameters:
+      - name: absPrioOverride
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_coverage: 1
+        rationale: "Enable absolute priority override for coverage-critical cells"
+
+algorithms:
+  - coverage_assessment: "RSRP + RSRQ + CQI composite scoring"
+  - power_optimization: "Reference signal power + PA/PB joint optimization"
+  - interference_mitigation: "ICIC + Power control + Tilt coordination"
+
+performance_targets:
+  - cell_edge_rsrp: ">= -110 dBm at 95th percentile"
+  - cell_availability: ">99.5%"
+  - cqi_improvement: ">10% shift toward higher CQI bins"
+  - sinr_improvement: ">2 dB cell-edge SINR gain"
+
+fallback_agents:
+  - power-agent
+  - antenna-agent
+  - rrm-agent
+
+# V3 Swarm Configuration
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 65
+  routing_hints:
+    - "Use for cell-edge RSRP/RSRQ improvement"
+    - "Route signal quality and CQI optimization here"
+    - "Handle coverage hole detection and mitigation"
+    - "Coordinate with power-agent and antenna-agent for RF tuning"
+
+memory_config:
+  namespace: coverage-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.92
+  confidence_threshold: 0.80

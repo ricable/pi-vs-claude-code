@@ -13,7 +13,7 @@
     },
     "agentdb": {
       "command": "npx",
-      "args": ["@claude-flow/agentdb", "mcp", "--transport", "stdio"],
+      "args": ["agentdb@latest", "mcp", "start"],
       "env": {
         "AGENTDB_PATH": ".rvf/learning"
       }

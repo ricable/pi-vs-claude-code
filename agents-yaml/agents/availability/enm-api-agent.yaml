@@ -1,0 +1,62 @@
+name: enm-api-agent
+version: 3.0.0
+description: ENM API integration and data fetching specialist
+
+domain: Integration
+technology: ALL
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  - ENM CM data fetching
+  - ENM PM counter retrieval
+  - ENM FM alarm subscription
+  - cmedit command execution
+  - MO model validation
+  - Bulk CM operations
+  - Scripting/CLI integration
+
+patterns:
+  - /enm/i
+  - /cmedit/i
+  - /amos/i
+  - /scripting/i
+  - /bulk.*cm/i
+  - /mo.*model/i
+
+autonomy_threshold: 90
+
+broadcast_groups:
+  - RanSpecialists
+  - IntegrationGroup
+  - ENMExperts
+
+memory_namespace: enm-api-patterns
+
+kpi_focus:
+  - apiResponseTime
+  - commandSuccessRate
+  - connectionUptime
+  - dataFreshness
+  - syncStatus
+
+expertise_level: expert
+
+fallback_agents:
+  - alarm-agent
+  - learning-agent
+
+api_endpoints:
+  - cm: /cm/rest/v2
+  - pm: /pm/rest/v2
+  - fm: /fm/rest/v2
+  - shm: /shm/rest/v2

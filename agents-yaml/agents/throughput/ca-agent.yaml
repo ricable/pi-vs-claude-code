@@ -1,0 +1,255 @@
+name: ca-agent
+version: 3.0.0
+description: Carrier aggregation and SCell optimization specialist
+
+domain: CA
+technology: ALL
+agent_type: specialist
+role: carrier-aggregation-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # SCell Activation/Deactivation
+  - SCell activation threshold tuning
+  - SCell deactivation threshold optimization
+  - Activation delay configuration
+  - SCell activation timer management
+  - Multi-SCell activation coordination
+  - SCell dormancy configuration
+
+  # Carrier Aggregation Scheduling
+  - Cross-carrier scheduling optimization
+  - PCell vs SCell traffic split
+  - CA scheduling algorithm tuning
+  - Band combination selection
+  - Component carrier priority
+  - Load-aware CA scheduling
+
+  # Multi-Carrier Configuration
+  - 2CC/3CC/4CC/5CC configuration
+  - Intra-band contiguous CA
+  - Intra-band non-contiguous CA
+  - Inter-band CA
+  - Band combination capability handling
+  - UE capability-aware CA assignment
+
+  # Throughput Optimization via CA
+  - Peak throughput maximization
+  - Average throughput improvement
+  - Cell-edge throughput boost via CA
+  - DL CA volume optimization
+  - PDSCH scheduling across carriers
+
+  # SCell Management
+  - SCell addition criteria
+  - SCell removal criteria
+  - SCell quality measurement
+  - SCell interference monitoring
+  - SCell selection algorithm
+  - Best SCell ranking
+
+  # CA-Aware Mobility
+  - CA-aware handover decisions
+  - SCell reconfiguration during mobility
+  - PCell change with CA continuity
+  - Inter-frequency CA mobility
+  - CA state preservation during HO
+
+  # NR Carrier Aggregation
+  - NR CA component carrier management
+  - NR-DC (Dual Connectivity) optimization
+  - EN-DC SCell management
+  - SUL (Supplementary Uplink) configuration
+  - FR1+FR2 aggregation
+
+  # Performance Monitoring
+  - CA activation rate tracking
+  - CA utilization efficiency
+  - Per-carrier throughput analysis
+  - CA scheduling efficiency
+  - CA fallback rate monitoring
+
+patterns:
+  - /carrier.*aggreg|CA|component.*carrier/i
+  - /SCell|scell|secondary.*cell/i
+  - /PCell|pcell|primary.*cell/i
+  - /2CC|3CC|4CC|5CC/i
+  - /cross.*carrier|inter.*band/i
+  - /activation.*thresh|deactivation/i
+  - /EN-DC|NR-DC|dual.*connect/i
+  - /band.*combin|intra.*band|inter.*band/i
+  - /CA.*schedul|CA.*throughput/i
+  - /SUL|supplementary.*uplink/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - CAExperts
+  - ThroughputOptimization
+  - CapacityManagement
+
+memory_namespace: ca-patterns
+
+kpi_focus:
+  # CA Activation
+  - pmCaActivatedDlIcmSum
+  - pmCaActivatedDlIcmSumDistr
+  - pmCaActivatedDl3ccSumDistr
+  - pmCaActivatedDl4ccSumDistr
+  - pmCaActivatedDl5ccSumDistr
+
+  # CA Scheduling
+  - pmCaScheduledDlSum
+  - pmCaScheduledDlIcmSumDistr
+  - pmCaScheduledDl2ccSumDistr
+
+  # Throughput
+  - pmUeThpDlDistr
+  - pmUeThpDlMbbFilteredDistr
+  - pmRadioThpVolDl
+
+  # PCell/SCell Volume
+  - pmCaPcellVolDl
+  - pmCaScellVolDl
+
+  # CA Fallback
+  - pmCaFallbackCount
+  - pmCaDeactivationCount
+
+  # PRB Utilization per carrier
+  - pmPrbUtilDl
+  - pmPrbUtilDlDistr
+
+expertise_level: expert
+specialization:
+  - scell_activation
+  - ca_scheduling
+  - multi_carrier_management
+  - throughput_via_ca
+  - nr_carrier_aggregation
+
+# CA Tuning — Concrete parameter ranges for SCell optimization
+ca_tuning:
+  scell_activation:
+    description: "Optimize SCell activation thresholds for carrier aggregation throughput"
+    parameters:
+      - name: sCellActThreshold
+        mo_class: SCell
+        range: "-140..-44"
+        unit: "dBm"
+        default: -100
+        recommended_throughput: "-110..-95"
+        rationale: "RSRP threshold for SCell activation. Lower threshold = more aggressive SCell activation = higher CA utilization."
+      - name: sCellDeactThreshold
+        mo_class: SCell
+        range: "-140..-44"
+        unit: "dBm"
+        default: -110
+        recommended_throughput: "-115..-105"
+        rationale: "RSRP threshold for SCell deactivation. Should be lower than activation threshold to avoid ping-pong."
+      - name: sCellDeactTimer
+        mo_class: SCell
+        range: "0..320"
+        unit: "ms (in multiples of 20ms)"
+        default: 40
+        recommended_throughput: "20-80"
+        rationale: "Timer before SCell is deactivated. Shorter = faster power savings; longer = more stable CA."
+      - name: numberOfActiveSCells
+        mo_class: EUtranCellFDD
+        range: "1..7"
+        default: 4
+        recommended_throughput: "3-5"
+        rationale: "Max number of simultaneously active SCells. Higher for peak throughput; lower for signaling overhead."
+  ca_scheduling:
+    description: "Tune CA scheduling for throughput maximization"
+    parameters:
+      - name: caSchedulingMode
+        mo_class: EUtranCellFDD
+        range: "0..2"
+        type: enum
+        default: 0
+        recommended_throughput: 1
+        rationale: "0=self-scheduling, 1=cross-carrier scheduling, 2=mixed. Cross-carrier scheduling improves CA efficiency."
+      - name: sCellsUpswitchDataThres
+        mo_class: EUtranCellFDD
+        range: "0..5000"
+        unit: "bytes"
+        default: 100
+        recommended_throughput: "50-150"
+        rationale: "Data volume trigger for SCell activation. Lower threshold = faster CA activation for bursty traffic."
+      - name: dlCaPreSchedulingEnabled
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_throughput: 1
+        rationale: "Enable pre-scheduling on SCell before full activation for faster CA throughput ramp-up."
+
+algorithms:
+  - scell_selection: "RSRP + Load + Interference ranking of candidate SCells"
+  - activation_decision: "Data volume + Channel quality + UE capability check"
+  - scheduling_split: "Load-aware proportional traffic split across carriers"
+
+performance_targets:
+  - ca_activation_rate: ">80% of CA-capable UEs activated"
+  - scell_utilization: ">60% scheduling time on SCells"
+  - throughput_gain: ">50% DL throughput improvement vs single carrier"
+  - ca_fallback_rate: "<5% deactivation due to quality"
+
+fallback_agents:
+  - rrm-agent
+  - throughput-agent
+  - capacity-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 65
+  routing_hints:
+    - "Use for carrier aggregation and SCell optimization"
+    - "Route CA activation thresholds and scheduling here"
+    - "Handle multi-carrier throughput optimization"
+    - "Coordinate with throughput-agent and rrm-agent"
+
+memory_config:
+  namespace: ca-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.80

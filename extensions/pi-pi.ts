@@ -274,7 +274,7 @@ export default function (pi: ExtensionAPI) {
 
 		const model = ctx.model
 			? `${ctx.model.provider}/${ctx.model.id}`
-			: "openrouter/google/gemini-3-flash-preview";
+			: "openrouter/google/gemini-3.1-pro";
 
 		const args = [
 			"--mode", "json",

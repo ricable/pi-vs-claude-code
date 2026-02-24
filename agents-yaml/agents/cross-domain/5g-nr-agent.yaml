@@ -1,0 +1,239 @@
+name: 5g-nr-agent
+version: 3.0.0
+description: 5G NR specialist for NR cell and beam management
+
+# Agent Metadata
+domain: NR
+technology: 5G
+agent_type: specialist
+role: nr-optimization
+
+capabilities:
+  # SS/PBCH Block (SSB) Management
+  - SSB configuration and optimization (case 1-4 patterns)
+  - SSB burst timing and repetition
+  - SSB RSRP threshold tuning
+  - SSB measurement reporting triggers
+  - SSB periodicity optimization (20ms, 40ms, 80ms, 160ms)
+
+  # Beam Management & Beamforming
+  - Codebook-based beamforming (Type I/II)
+  - Beam refinement procedures
+  - Beam failure detection and recovery
+  - Beam correspondence maintenance
+  - Beam sweeping optimization
+  - Quasi-co-location (QCL) configuration
+
+  # NR Cell Configuration
+  - NR cell parameter tuning (FR1/FR2 band specific)
+  - Subcarrier spacing optimization (15kHz, 30kHz, 60kHz, 120kHz)
+  - Numerology selection based on spectrum and latency
+  - Frame structure optimization
+  - Slot-based resource allocation
+
+  # Standalone (SA) and Non-Standalone (NSA) Modes
+  - EN-DC (E-UTRAN NR Dual Connectivity) optimization
+  - NR-only (SA) mode deployment
+  - Secondary Node (SN) configuration
+  - Master Node (MN) coordination
+  - DC resource allocation and steering
+
+  # NR Carrier Aggregation (NR-CA)
+  - Intra-band and inter-band NR-CA configuration
+  - Component carrier activation/deactivation
+  - Cross-carrier scheduling
+  - CA handover and measurement control
+  - FR1-FR2 CA combinations
+
+  # Reference Signals & Measurement
+  - CSI-RS (Channel State Information RS) configuration
+  - CSI-RS periodicity and repetition
+  - CSI reporting mechanisms (Type I/II)
+  - PTRS (Phase Tracking RS) for phase noise mitigation
+  - TRS (Tracking RS) configuration
+  - DMRS (Demodulation RS) optimization
+
+  # Bandwidth Parts (BWP) Management
+  - Initial DL/UL BWP configuration
+  - BWP switching triggers and latency
+  - Cross-slot BWP switching
+  - Power mode optimization per BWP
+  - Duration-based and event-based switching
+
+  # Control Resource Set (CORESET) & Search Space
+  - CORESET aggregation level optimization
+  - Search space design (UE-specific and common)
+  - DCI format selection (Format 0-2)
+  - PDCCH monitoring occasion optimization
+  - Blind decoding reduction strategies
+
+  # Scheduling & Resource Allocation
+  - Resource block group (RBG) allocation strategies
+  - Type I and Type II resource allocation
+  - VRB-to-PRB mapping
+  - Slot allocation optimization
+  - Repetition and muting patterns
+
+  # Advanced Features
+  - RAN slicing configuration
+  - Network slicing support (URLLC/eMBB/mMTC)
+  - QoS flow mapping to DRBs
+  - Priority handling and preemption
+  - Semi-persistent scheduling (SPS)
+  - Configured grant (CG) configuration
+
+patterns:
+  - /NRCell|NR-cell/i
+  - /SSB|ssb|PBCH.*block/i
+  - /beam|Beam|beamforming/i
+  - /nr|NR|5G|new.*radio/i
+  - /NSA|SA|EN-DC|dual.*connectivity/i
+  - /CORESET|search.*space/i
+  - /BWP|bwp|bandwidth.*part/i
+  - /CSI-RS|channel.*state|reference.*signal/i
+  - /DMRS|PTRS|TRS|tracking.*signal/i
+  - /QoS.*flow|DRB|network.*slicing/i
+  - /Fr1|FR2|frequency.*range/i
+  - /subcarrier.*spacing|numerology/i
+
+autonomy_threshold: 85
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+broadcast_groups:
+  - RanSpecialists
+  - TechnologyGroup
+  - NRExperts
+  - BeamManagement
+  - AdvancedOptimization
+
+memory_namespace: nr-patterns
+
+kpi_focus:
+  # Connection Establishment
+  - pmRrcConnEstabSuccNr
+  - pmRrcConnEstabAttNr
+  - pmRrcConnEstabFailNr
+  - pmRrcConnEstabTimeNr
+
+  # Beam Performance
+  - pmBeamFailure
+  - pmBeamFailureRecovery
+  - pmBeamSwitchRate
+  - pmBeamQuality
+
+  # Handover Performance
+  - pmHoExeSuccRate
+  - pmHoPrepSuccRate
+  - pmInterRatHoSucc
+  - pmHoExeFail
+
+  # Bearer Establishment
+  - pmDrbEstabSucc
+  - pmDrbEstabFail
+  - pmDrbActivationTime
+
+  # Resource Utilization
+  - pmPrbUtilDl
+  - pmPrbUtilUl
+  - pmBwpActiveDl
+  - pmBwpActiveUl
+
+  # Signal Quality
+  - pmRsrpDl
+  - pmSinrDl
+  - pmCsiRsRsrp
+
+  # DC Specific (EN-DC)
+  - pmEnDcActiveUe
+  - pmEnDcSplitBearers
+  - pmDualConnectivitySucc
+
+expertise_level: expert
+specialization:
+  - beam_management
+  - nr_cell_optimization
+  - advanced_scheduling
+  - network_slicing
+  - dual_connectivity
+  - fr1_fr2_support
+
+dependencies:
+  - requires_knowledge: RRM, CAC, load_balancing
+  - supports: handover, inter_rat_ho
+  - compatible_with: 4G, LTE, EN-DC
+  - radio_access_tech: NR
+
+advanced_algorithms:
+  - beam_failure_recovery: AI-based prediction
+  - csi_feedback_optimization: Overhead reduction
+  - power_allocation: Dynamic PF scheduling
+  - interference_management: Coordinated multipoint (CoMP)
+
+fallback_agents:
+  - rrm-agent
+  - mobility-agent
+  - admission-agent
+
+# V3 Swarm Configuration
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 10
+  task_timeout_ms: 35000
+
+# Routing Intelligence
+routing:
+  complexity_threshold: high
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m  # NR beam management is complex
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: false  # Beam optimization requires deep reasoning
+  priority_score: 85
+  routing_hints:
+    - "Use for NR cell, SSB, beam management"
+    - "Route BWP, CORESET, CSI-RS optimization here"
+    - "Handle NR-specific massive MIMO and beamforming"
+    - "Coordinate with 4g-lte-agent for EN-DC"
+    - "Preferred for FR1/FR2 and network slicing"
+
+# Memory Integration
+memory_config:
+  namespace: nr-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 40
+
+# Coordination
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 45
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+# Context Files
+context_files:
+  identity: src/zeroclaw/agents/5g-nr/IDENTITY.md
+  features: src/zeroclaw/agents/5g-nr/context/features.md
+  knowledge: src/zeroclaw/agents/5g-nr/context/5g-nr-knowledge.json
+  capabilities: src/zeroclaw/agents/5g-nr/context/capabilities_summary.md
+
+# Performance Targets
+performance:
+  response_time_p50_ms: 350
+  response_time_p95_ms: 650
+  accuracy_target: 0.90
+  confidence_threshold: 0.85

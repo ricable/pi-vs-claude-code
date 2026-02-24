@@ -1,0 +1,250 @@
+name: power-agent
+version: 3.0.0
+description: Uplink and downlink power control optimization specialist
+
+domain: Power
+technology: ALL
+agent_type: specialist
+role: power-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # Uplink Power Control
+  - Open-loop power control (OLPC) tuning
+  - Closed-loop power control (CLPC) configuration
+  - P0 nominal PUSCH optimization
+  - P0 nominal PUCCH optimization
+  - Path-loss compensation factor (alpha) tuning
+  - Power headroom report (PHR) interpretation
+  - TPC command optimization
+  - Accumulated vs absolute TPC modes
+  - PUSCH power ramp-up optimization
+
+  # Downlink Power Control
+  - Reference signal power optimization
+  - PA/PB power offset configuration
+  - PDSCH power allocation
+  - PDCCH power control
+  - PHICH power offset tuning
+  - CRS power boost management
+  - Max transmit power budgeting
+  - Power spectral density management
+
+  # Interference Management via Power
+  - Inter-cell interference control through power
+  - Cell-edge power boosting strategies
+  - Center-cell power reduction
+  - Fractional power control for UL interference
+  - Interference-aware power allocation
+  - ICIC power profiles
+
+  # NR Power Control
+  - NR PUSCH power control (P0, alpha per BWP)
+  - NR PUCCH power control
+  - SRS power control
+  - SSB power configuration
+  - CSI-RS power management
+  - Beam-specific power control
+  - Power control per component carrier
+
+  # Energy Efficiency
+  - Transmit power reduction strategies
+  - MIMO sleep mode power savings
+  - Symbol/slot-level power shutdown
+  - Carrier shutdown for power saving
+  - PA efficiency optimization
+  - Power amplifier back-off tuning
+
+  # Power Headroom Analysis
+  - UL PHR distribution analysis
+  - Power-limited UE detection
+  - PHR-based admission decisions
+  - Uplink coverage estimation from PHR
+  - PHR-triggered parameter adaptation
+
+  # Advanced Power Features
+  - Dynamic power allocation
+  - Traffic-adaptive power control
+  - ML-based power optimization
+  - Multi-carrier power budgeting
+  - Power control for CoMP
+  - Power control for carrier aggregation
+
+patterns:
+  - /power.*control|power.*alloc|power.*optim/i
+  - /PUSCH.*power|PUCCH.*power|p0.*nominal/i
+  - /alpha|path.*loss.*comp/i
+  - /PA.*PB|power.*offset|power.*boost/i
+  - /transmit.*power|tx.*power/i
+  - /PHR|power.*headroom/i
+  - /OLPC|CLPC|TPC/i
+  - /reference.*signal.*power/i
+  - /interference.*power|ICIC.*power/i
+  - /energy.*efficiency|power.*save/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - PowerExperts
+  - RFOptimization
+  - InterferenceManagement
+
+memory_namespace: power-patterns
+
+kpi_focus:
+  # UL SINR
+  - pmUlSinrDistr
+  - pmUlSinrPdcchDistr
+
+  # Interference
+  - pmRadioRecInterferencePwrPrb10
+  - pmRadioRecInterferencePwrPrb22
+  - pmRadioRecInterferencePwrPrb34
+
+  # Transmit Power
+  - pmTxPowerDl
+  - pmTxPowerUl
+  - pmTransmittedCarrierPowerDl
+
+  # Power Headroom
+  - pmPhrDistr
+  - pmPowerLimitedUe
+
+  # PDCCH
+  - pmPdcchCceUtil
+
+  # Energy
+  - pmEnergyConsumption
+  - pmConsumedEnergy
+
+  # Throughput (power-impacted)
+  - pmRadioThpVolDl
+  - pmRadioThpVolUl
+
+expertise_level: expert
+specialization:
+  - uplink_power_control
+  - downlink_power_allocation
+  - interference_via_power
+  - energy_efficiency
+  - power_headroom_analysis
+
+# UL Power Control Tuning — Concrete parameter ranges
+ul_power_tuning:
+  pusch_power_control:
+    description: "Optimize uplink power control for improved UL SINR and reduced inter-cell interference"
+    parameters:
+      - name: pZeroNominalPusch
+        mo_class: EUtranCellFDD
+        range: "-126..24"
+        unit: "dBm"
+        default: -96
+        recommended_sinr: "-100..-90"
+        rationale: "Lower P0 reduces UL interference; raise to improve cell-edge UL SINR. Typical range -100 to -90 dBm."
+      - name: alpha
+        mo_class: EUtranCellFDD
+        range: "0..10"
+        unit: "0.1 (0=0.0, 4=0.4, 7=0.7, 8=0.8, 10=1.0)"
+        default: 8
+        recommended_sinr: "7-10"
+        rationale: "Path-loss compensation factor. alpha=1.0 (10) for full compensation; 0.7-0.8 for fractional (reduces cell-edge interference)"
+      - name: p0NominalPucch
+        mo_class: EUtranCellFDD
+        range: "-127..24"
+        unit: "dBm"
+        default: -105
+        recommended_sinr: "-108..-100"
+        rationale: "Control channel power baseline. Raise for better PUCCH reliability at cell edge."
+  dl_power_control:
+    description: "Optimize downlink power allocation for coverage and capacity balance"
+    parameters:
+      - name: referenceSignalPower
+        mo_class: EUtranCellFDD
+        range: "-60..500"
+        unit: "0.1 dBm"
+        default: 186
+        recommended_coverage: "180-250"
+        rationale: "Increase for better DL coverage; decrease to reduce inter-cell interference"
+      - name: pA
+        mo_class: EUtranCellFDD
+        range: "-6..3"
+        unit: "dB"
+        default: 0
+        recommended_coverage: "0-3"
+        rationale: "Positive values boost PDSCH power for coverage; negative values save power"
+      - name: pB
+        mo_class: EUtranCellFDD
+        range: "0..3"
+        type: enum
+        default: 1
+        recommended_coverage: "0-1"
+        rationale: "Controls PDSCH-to-CRS power ratio on OFDM symbols with/without CRS"
+
+algorithms:
+  - uplink_power: "P0 + alpha * PL + TPC closed-loop correction"
+  - downlink_power: "Reference signal power + PA/PB allocation"
+  - interference_control: "Fractional power control + ICIC power profiles"
+
+performance_targets:
+  - ul_sinr_improvement: ">2 dB at cell edge"
+  - interference_reduction: ">3 dB at cell edge"
+  - power_headroom_target: "60% UEs with PHR > 5 dB"
+  - energy_reduction: ">10% power consumption savings"
+
+fallback_agents:
+  - coverage-agent
+  - interference-agent
+  - rrm-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 65
+  routing_hints:
+    - "Use for UL/DL power control optimization"
+    - "Route P0, alpha, PA/PB tuning here"
+    - "Handle power headroom analysis"
+    - "Coordinate with coverage-agent and interference-agent"
+
+memory_config:
+  namespace: power-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.92
+  confidence_threshold: 0.80

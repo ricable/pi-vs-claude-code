@@ -1,0 +1,270 @@
+name: capacity-agent
+version: 3.0.0
+description: Cell capacity optimization and congestion management specialist
+
+domain: Capacity
+technology: ALL
+agent_type: specialist
+role: capacity-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # PRB Capacity Management
+  - DL PRB utilization optimization
+  - UL PRB utilization optimization
+  - PRB allocation efficiency improvement
+  - Spectral efficiency optimization
+  - Frequency-selective scheduling for capacity
+  - Time-domain scheduling optimization
+
+  # User Capacity
+  - Connected user capacity planning
+  - RRC connection capacity management
+  - Active UE capacity optimization
+  - Max user threshold tuning
+  - User admission for capacity
+  - Service-aware capacity allocation
+
+  # Throughput Optimization
+  - DL throughput improvement strategies
+  - UL throughput improvement strategies
+  - Peak throughput vs average throughput tradeoff
+  - Cell-edge throughput improvement
+  - User throughput distribution optimization
+
+  # Carrier Aggregation for Capacity
+  - SCell activation for capacity boost
+  - Multi-carrier capacity planning
+  - CA scheduling optimization
+  - Inter-carrier load balancing
+  - Carrier capacity budgeting
+
+  # Congestion Management
+  - Congestion detection and classification
+  - Busy-hour capacity planning
+  - Traffic-aware capacity policies
+  - Congestion-triggered parameter adaptation
+  - Overload prevention strategies
+  - Pre-emptive congestion avoidance
+
+  # Scheduling Optimization
+  - DL scheduler algorithm tuning
+  - UL scheduler optimization
+  - Proportional fair vs max throughput
+  - Round-robin scheduling for fairness
+  - QoS-aware scheduling parameters
+  - HARQ optimization for capacity
+
+  # Capacity Expansion Triggers
+  - Capacity threshold monitoring
+  - Expansion recommendation generation
+  - Small cell overlay recommendations
+  - Frequency refarming analysis
+  - Bandwidth expansion planning
+
+  # Advanced Capacity Features
+  - MIMO rank optimization for capacity
+  - 256QAM activation thresholds
+  - Modulation order optimization
+  - PDCCH capacity optimization
+  - Control channel resource management
+
+patterns:
+  - /capacity|capacity.*plan|capacity.*optim/i
+  - /congestion|busy.*hour|overload/i
+  - /throughput|thp|data.*rate/i
+  - /PRB.*util|resource.*util/i
+  - /spectral.*effic|bandwidth.*effic/i
+  - /scheduler|scheduling|QoS/i
+  - /HARQ|retransmission|BLER/i
+  - /256QAM|modulation|MCS/i
+  - /MIMO.*rank|spatial.*multiplex/i
+  - /user.*capacity|connected.*user/i
+  - /expansion|refarming|small.*cell/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - CapacityExperts
+  - CongestionManagement
+  - PerformanceOptimization
+
+memory_namespace: capacity-patterns
+
+kpi_focus:
+  # PRB Utilization
+  - pmPrbUtilDl
+  - pmPrbUtilDlDistr
+  - pmPrbUsedDl
+  - pmPrbAvailDl
+  - pmPrbUsedUl
+  - pmPrbAvailUl
+
+  # Active UEs
+  - pmActiveUeDlMax
+  - pmActiveUeDlSum
+  - pmActiveUeDlTrueSamp
+  - pmActiveUeUlMax
+
+  # Throughput
+  - pmRadioThpVolDl
+  - pmRadioThpVolUl
+  - pmUeThpDlDistr
+  - pmUeThpDlMbbFilteredDistr
+
+  # Retransmissions
+  - pmPrbUsedDlReTrans
+  - pmDlBlerDistr
+
+  # Scheduling
+  - pmPdcchCceUtil
+  - pmSchedulerActivity
+
+  # Congestion
+  - pmCongestionTime
+  - pmCongestionLevel
+
+  # Modulation
+  - pmMcsDistrDl
+  - pmMcsDistrUl
+
+expertise_level: expert
+specialization:
+  - prb_utilization
+  - throughput_optimization
+  - congestion_management
+  - scheduling_efficiency
+  - capacity_planning
+
+# Capacity Tuning — Concrete parameter ranges
+capacity_tuning:
+  prb_optimization:
+    description: "Optimize PRB utilization and scheduling efficiency for maximum capacity"
+    parameters:
+      - name: dlMaxWaitingTime
+        mo_class: EUtranCellFDD
+        range: "1..50"
+        unit: "ms"
+        default: 20
+        recommended_capacity: "10-15"
+        rationale: "Reduce max scheduling waiting time to improve throughput fairness under load"
+      - name: dlSchedulerDynamicBwAllocationEnabled
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_capacity: 1
+        rationale: "Enable dynamic bandwidth allocation for more efficient DL scheduling"
+      - name: ulSchedulerDynamicBwAllocationEnabled
+        mo_class: EUtranCellFDD
+        range: "0..1"
+        type: boolean
+        default: 0
+        recommended_capacity: 1
+        rationale: "Enable dynamic bandwidth allocation for more efficient UL scheduling"
+      - name: dlMcsRestriction
+        mo_class: EUtranCellFDD
+        range: "0..28"
+        default: 28
+        recommended_capacity: "24-28"
+        rationale: "Max MCS index. Higher enables 256QAM (if supported) for peak throughput."
+  user_capacity:
+    description: "Tune user admission and capacity thresholds"
+    parameters:
+      - name: admNrOfUsersThreshold
+        mo_class: EUtranCellFDD
+        range: "0..1200"
+        default: 600
+        recommended_capacity: "400-800"
+        rationale: "Max connected users per cell. Lower to protect per-user throughput; raise for denser deployment."
+      - name: maxConnectedUsers
+        mo_class: EUtranCellFDD
+        range: "0..1200"
+        default: 1200
+        recommended_capacity: "600-1000"
+        rationale: "Hard limit on connected users. Set below max to leave headroom."
+  scheduling:
+    description: "Scheduler tuning for capacity optimization"
+    parameters:
+      - name: dlCompositLoadThreshold
+        mo_class: EUtranCellFDD
+        range: "50..100"
+        unit: "%"
+        default: 90
+        recommended_capacity: "75-85"
+        rationale: "Composite load threshold for congestion detection. Lower for earlier intervention."
+      - name: maxNumHarqDlReTx
+        mo_class: EUtranCellFDD
+        range: "0..8"
+        default: 3
+        recommended_capacity: "2-4"
+        rationale: "Max HARQ retransmissions. Lower saves PRBs; higher improves reliability at cell edge."
+
+algorithms:
+  - capacity_assessment: "PRB utilization + Active UEs + Throughput composite"
+  - scheduling_policy: "QoS priority + Proportional fairness + Load awareness"
+  - congestion_detection: "Multi-threshold (warning → action → critical) with hysteresis"
+
+performance_targets:
+  - prb_utilization: "<85% average during busy hour"
+  - dl_throughput: ">10% improvement in median user throughput"
+  - congestion_time: "<5% of busy hour in congestion"
+  - spectral_efficiency: ">2.5 bps/Hz average"
+
+fallback_agents:
+  - rrm-agent
+  - loadbalance-agent
+  - admission-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 10
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 70
+  routing_hints:
+    - "Use for PRB utilization and capacity optimization"
+    - "Route congestion management and busy-hour tuning here"
+    - "Handle throughput optimization and scheduling"
+    - "Coordinate with rrm-agent and loadbalance-agent"
+
+memory_config:
+  namespace: capacity-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.92
+  confidence_threshold: 0.82

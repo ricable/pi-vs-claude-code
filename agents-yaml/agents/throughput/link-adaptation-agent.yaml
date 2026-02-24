@@ -1,0 +1,220 @@
+name: link-adaptation-agent
+version: 3.0.0
+description: BLER/OLLA/MCS/CQI/HARQ link adaptation specialist
+
+domain: LinkAdaptation
+technology: ALL
+agent_type: specialist
+role: link-adaptation-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # OLLA Optimization
+  - Outer-loop link adaptation tuning
+  - BLER target optimization per traffic type
+  - OLLA step size calibration (up/down)
+  - OLLA convergence speed control
+  - Initial BLER target selection for new UEs
+
+  # MCS Optimization
+  - MCS restriction policy tuning
+  - DL MCS distribution analysis
+  - UL MCS distribution analysis
+  - MCS-to-modulation mapping optimization
+  - Adaptive MCS table selection (64QAM/256QAM)
+
+  # CQI Configuration
+  - CQI filter coefficient tuning
+  - CQI reporting periodicity optimization
+  - Wideband vs subband CQI selection
+  - CQI offset calibration
+  - CQI-to-MCS mapping adjustment
+
+  # HARQ Tuning
+  - HARQ retransmission count optimization
+  - HARQ combining efficiency analysis
+  - DL HARQ timing optimization
+  - UL HARQ feedback tuning
+  - Retransmission resource impact analysis
+
+  # BLER Management
+  - First-transmission BLER monitoring
+  - BLER distribution analysis across MCS
+  - Target BLER vs throughput tradeoff
+  - BLER anomaly detection
+  - Per-cell BLER baseline establishment
+
+patterns:
+  - /BLER|bler.*target|first.*trans/i
+  - /OLLA|outer.*loop|link.*adapt/i
+  - /MCS|modulation.*coding|mcs.*restrict/i
+  - /CQI|channel.*quality|cqi.*filter/i
+  - /HARQ|retransmission|harq.*retx/i
+  - /olpc|step.*size|bler.*distr/i
+  - /code.*rate|spectral.*effic/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - ThroughputExperts
+  - LinkAdaptationExperts
+
+memory_namespace: link-adaptation-patterns
+
+kpi_focus:
+  # BLER
+  - pmDlBlerDistr
+  - pmUlBlerDistr
+  - pmDlBlerFirstTx
+
+  # MCS
+  - pmMcsDistrDl
+  - pmMcsDistrUl
+
+  # CQI
+  - pmCqiDistr
+
+  # HARQ
+  - pmHarqRetxDl
+  - pmHarqRetxUl
+  - pmPrbUsedDlReTrans
+  - pmPrbUsedUlReTrans
+
+  # Throughput (secondary)
+  - pmUeThpDlDistr
+  - pmUeThpUlDistr
+
+expertise_level: expert
+specialization:
+  - olla_optimization
+  - mcs_restriction
+  - cqi_configuration
+  - harq_tuning
+  - bler_management
+
+# Link Adaptation Tuning -- Concrete parameter ranges
+olla_optimization:
+  description: "Outer-loop link adaptation BLER target and step size tuning"
+  parameters:
+    - name: olpcBlerTarget
+      mo_class: EUtranCellFDD
+      range: "1..30"
+      unit: "%"
+      default: 10
+      recommended: "8-12"
+      rationale: "BLER target for outer-loop. Lower = conservative; higher = aggressive throughput."
+    - name: olpcStepSizeUp
+      mo_class: EUtranCellFDD
+      range: "1..10"
+      unit: "0.1 dB"
+      default: 2
+      recommended: "1-3"
+      rationale: "MCS up-step size on ACK. Larger = faster ramp-up to higher MCS."
+    - name: olpcStepSizeDown
+      mo_class: EUtranCellFDD
+      range: "1..10"
+      unit: "0.1 dB"
+      default: 2
+      recommended: "2-4"
+      rationale: "MCS down-step size on NACK. Larger = faster fallback."
+
+mcs_restriction:
+  description: "MCS restriction for reliability vs throughput balance"
+  parameters:
+    - name: dlMcsRestriction
+      mo_class: EUtranCellFDD
+      range: "0..28"
+      default: 28
+      recommended: "24-28"
+      rationale: "Max DL MCS index. Restrict for high-interference cells."
+    - name: ulMcsRestriction
+      mo_class: EUtranCellFDD
+      range: "0..23"
+      default: 23
+      recommended: "20-23"
+      rationale: "Max UL MCS index. Restrict for cell-edge UE protection."
+
+cqi_configuration:
+  description: "CQI reporting and filter optimization"
+  parameters:
+    - name: cqiFilterCoefficient
+      mo_class: EUtranCellFDD
+      range: "0..7"
+      default: 4
+      recommended: "3-5"
+      rationale: "CQI averaging filter. Higher = smoother but slower adaptation."
+    - name: mcsOffset
+      mo_class: EUtranCellFDD
+      range: "-8..8"
+      default: 0
+      recommended: "-2..2"
+      rationale: "Static offset applied to CQI-to-MCS mapping."
+
+algorithms:
+  - bler_analysis: "First-tx BLER distribution + retransmission rate composite"
+  - olla_calibration: "Step size + target BLER + convergence speed co-optimization"
+  - mcs_policy: "Interference level + UE capability + traffic type -> MCS restriction"
+
+performance_targets:
+  - bler_first_tx: "<10% first transmission BLER"
+  - bler_residual: "<1% residual BLER after HARQ"
+  - mcs_utilization: ">70% of DL samples at MCS >= 20"
+  - retransmission_overhead: "<15% PRB used for retransmissions"
+
+fallback_agents:
+  - throughput-agent
+  - rrm-agent
+  - power-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 60
+  routing_hints:
+    - "Use for BLER/OLLA/MCS optimization"
+    - "Route CQI and HARQ tuning here"
+    - "Handle link adaptation and retransmission optimization"
+    - "Coordinate with throughput-agent and power-agent"
+
+memory_config:
+  namespace: link-adaptation-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.80

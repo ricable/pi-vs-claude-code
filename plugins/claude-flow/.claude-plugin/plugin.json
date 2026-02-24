@@ -1,0 +1,26 @@
+{
+  "name": "claude-flow",
+  "description": "Enterprise AI agent orchestration with Ruflo v3: 60+ specialized agents, swarm coordination (hierarchical/mesh/star/ring topologies), HNSW vector memory via AgentDB, self-learning hooks with ReasoningBank, MCP server with 213+ tools, AIDefence security, 3-tier model routing, and SPARC methodology workflows.",
+  "version": "3.0.0",
+  "author": {
+    "name": "ruvnet",
+    "url": "https://github.com/ruvnet/claude-flow"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/ruvnet/claude-flow",
+  "homepage": "https://github.com/ruvnet/claude-flow",
+  "keywords": [
+    "claude-flow",
+    "ruflo-v3",
+    "agent-orchestration",
+    "swarm-coordination",
+    "hnsw-memory",
+    "mcp-server",
+    "self-learning-hooks",
+    "reasoningbank",
+    "aidefence",
+    "sparc-methodology",
+    "multi-agent",
+    "enterprise-ai"
+  ]
+}

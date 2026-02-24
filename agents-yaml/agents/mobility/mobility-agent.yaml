@@ -1,0 +1,221 @@
+name: mobility-agent
+version: 3.0.0
+description: Handover and mobility optimization specialist
+
+domain: Mobility
+technology: ALL
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # Handover Optimization
+  - Event-triggered handover (A1/A2/A3/A4/A5/B1/B2)
+  - Handover execution success rate optimization
+  - Handover preparation success improvement
+  - Handover failure analysis and recovery
+  - Handover command transmission optimization
+  - Handover confirmation timeout tuning
+  - Handover interruption time minimization
+
+  # Mobility Parameter Tuning
+  - Measurement configuration optimization
+  - Event A3 offset tuning (cell offset for HO triggering)
+  - Event A4/A5 threshold optimization
+  - Hysteresis parameter tuning (HysteresisCSI)
+  - Time-to-trigger (TTT) optimization (40ms-640ms)
+  - Handover margin tuning
+  - Speed-dependent parameter adaptation
+  - Measurement reporting repetition
+
+  # Automatic Neighbor Relations (ANR)
+  - ANR for neighbor cell discovery
+  - Automatic neighbor detection
+  - Neighbor cell frequency assignment
+  - ECGI resolution and verification
+  - Neighbor cell measurement reporting
+  - Automatic relation addition/removal
+  - ANR parameter optimization
+  - Rogue cell detection
+  - Handover candidate ranking
+
+  # Inter-RAT Handover (LTE-to-5G, 5G-to-LTE)
+  - E-UTRAN to NR handover (LTE-to-5G)
+  - NR to E-UTRAN handover (5G-to-LTE)
+  - Inter-RAT measurement configuration
+  - Dual connectivity in EN-DC
+  - Handover vs. dual connectivity decision
+  - Inter-RAT candidate ranking
+  - Inter-RAT resource availability verification
+
+  # Connected Mode Mobility
+  - RRC Connected state mobility
+  - Handover-based mobility
+  - Cell change during connected mode
+  - Measurement report-triggered mobility
+  - Load-based handover
+  - Quality-based handover
+  - Coverage-based handover
+
+  # Idle Mode Mobility
+  - Cell reselection optimization
+  - Idle mode measurement configuration
+  - Cell reselection priority tuning
+  - Intra-frequency cell reselection
+  - Inter-frequency cell reselection
+  - Inter-RAT cell reselection
+  - Reselection hyperparameter tuning
+
+  # Ping-Pong Prevention
+  - Hysteresis mechanisms
+  - Time-to-trigger (TTT) for stability
+  - Cell dwell time enforcement
+  - Handover backoff (HO back)
+  - Ping-pong rate monitoring
+  - Handover frequency throttling
+  - UE speed estimation for HO decisions
+
+  # Beam Management (NR specific)
+  - Beam failure handling
+  - Beam failure recovery procedures
+  - Beam-based handover
+  - Beam correspondence maintenance
+  - Beam refinement during HO
+  - Beam switching optimization
+
+  # Measurement Reporting
+  - Periodic measurement reporting
+  - Event-triggered reporting
+  - Best cell reporting
+  - Measurement report periodicity tuning
+  - Amount and threshold configuration
+  - Reporting cell format optimization
+
+  # Advanced Features
+  - Machine learning-based HO prediction
+  - Trajectory-based HO decision
+  - Speed-dependent thresholds
+  - Service type-aware HO
+  - Energy-efficient handover strategies
+  - Predictive HO triggering
+  - Context-aware HO decisions
+
+  # Handover Failure Recovery
+  - Radio link failure (RLF) detection
+  - RLF recovery procedure
+  - Re-establishment attempt optimization
+  - Fallback cell selection
+  - Out-of-sync indication handling
+
+patterns:
+  - /handover|HO|handoff|ho|ho.*success/i
+  - /mobility|mobile.*opt/i
+  - /ANR|automatic.*neighbor|neighbor.*discovery/i
+  - /neighbor.*rel|neighbor.*list|neighbor.*cell/i
+  - /hysteresis|TTT|time.*trigger/i
+  - /timeToTrigger|A3.*event|A4.*event|A5.*event/i
+  - /measurement.*report|measurement.*config/i
+  - /cell.*reselection|idle.*mode/i
+  - /ping.*pong|ho.*failure|RLF/i
+  - /beam.*fail|beam.*switch|beam.*manage/i
+  - /inter-RAT|E-UTRAN.*NR/i
+  - /connected.*mode|RRC.*connected/i
+
+autonomy_threshold: 85
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - MobilityExperts
+  - BeamManagement
+  - PerformanceOptimization
+
+memory_namespace: mobility-patterns
+
+kpi_focus:
+  # Handover Execution
+  - pmHoExeSuccRate
+  - pmHoExeSucc
+  - pmHoExeFail
+  - pmHoExeFailRate
+  - pmHoExeTime
+
+  # Handover Preparation
+  - pmHoPrepSuccRate
+  - pmHoPrepSucc
+  - pmHoPrepFail
+  - pmHoPrepFailRate
+
+  # Inter-RAT Handover
+  - pmInterRatHoSucc
+  - pmInterRatHoFail
+  - pmInterRatHoSuccRate
+  - pmEutranNrHoSucc
+  - pmNrEutranHoSucc
+
+  # Ping-Pong
+  - pmHoPingpong
+  - pmPingpongRate
+  - pmHoFrequency
+  - pmCellDwellTime
+
+  # Measurement Performance
+  - pmMeasurementCompleted
+  - pmMeasurementFailed
+  - pmReportingSuccess
+
+  # Radio Link Failure
+  - pmRadioLinkFailure
+  - pmRlfRecoverySuccess
+  - pmRlfRecoveryFail
+
+  # Beam Performance (NR)
+  - pmBeamFailure
+  - pmBeamFailureRecovery
+  - pmBeamSwitchRate
+
+  # Cell Reselection
+  - pmCellReselectionSucc
+  - pmCellReselectionRate
+
+expertise_level: expert
+specialization:
+  - handover_optimization
+  - inter_rat_mobility
+  - beam_management
+  - measurement_configuration
+  - mobility_robustness
+
+algorithms:
+  - handover_decision: "Event-triggered + Load-aware + Speed-dependent"
+  - neighbor_ranking: "Signal strength + Load + Capacity + Availability"
+  - ping_pong_prevention: "TTT + Hysteresis + Dwell time + Backoff"
+  - measurement_config: "UE speed + Service type + Coverage map"
+
+event_thresholds:
+  a3_event: "RSRP offset: 0-10dB (typical 3dB)"
+  a4_event: "Absolute RSRP threshold: -120 to -85 dBm"
+  a5_event: "Dual threshold (serving + neighbor)"
+  tti_options: "[40ms, 64ms, 100ms, 128ms, 160ms, 256ms, 320ms, 640ms]"
+
+performance_targets:
+  - ho_success_rate: ">98%"
+  - ho_failure_rate: "<2%"
+  - ping_pong_rate: "<1% (per 5 minutes)"
+  - handover_interruption: "<150ms"
+  - inter_rat_ho_success: ">97%"
+  - measurement_reporting: ">99%"
+
+fallback_agents:
+  - rrm-agent
+  - 4g-lte-agent
+  - 5g-nr-agent
+  - admission-agent

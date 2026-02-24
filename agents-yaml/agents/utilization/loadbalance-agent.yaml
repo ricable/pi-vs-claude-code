@@ -1,0 +1,197 @@
+name: loadbalance-agent
+version: 3.0.0
+description: Load distribution and traffic steering specialist
+
+domain: LoadBalancing
+technology: ALL
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # Traffic Steering Optimization
+  - 3GPP A3/A4/A5 event-based traffic steering
+  - Load-based traffic steering (LBTS)
+  - Preference-based traffic steering (PBTS)
+  - Evolved PBTS with load-based factors
+  - Handover offset tuning for load distribution
+  - Restricted association and barring
+  - Associate downlink/uplink cell steering
+
+  # Mobility Load Balancing (MLB)
+  - MLB across same frequency cells
+  - Inter-frequency MLB (LTE/NR)
+  - Inter-RAT MLB (LTE-to-NR, NR-to-LTE)
+  - MLB triggered by overload conditions
+  - MLB margin and threshold optimization
+  - Handover execution order prioritization
+
+  # Cell Load Distribution
+  - Load measurement and estimation
+  - Predicted load calculation
+  - Load balancing metrics computation
+  - PRB utilization-based distribution
+  - Queue length-based steering
+  - Buffer occupancy-based decisions
+  - Dynamic UE rerouting
+
+  # Capacity-Based Handover
+  - Capacity-aware HO decisions
+  - Target cell capacity verification
+  - Capacity-based ranking of candidates
+  - Overload avoidance handovers
+  - Congestion-aware cell reselection
+  - Resource availability checking
+
+  # User Distribution Strategies
+  - User load spreading algorithms
+  - Geographic user distribution
+  - Service type-aware distribution
+  - Temporal distribution patterns
+  - Load-aware cell grouping
+  - Hierarchical cell selection
+
+  # Load-Aware Scheduling
+  - User-fair scheduling in overload
+  - Service-type-aware scheduling
+  - QoS-aware load distribution
+  - Traffic type prioritization
+  - Service biasing
+  - Load factor consideration in scheduling
+
+  # Neighbor Cell Management
+  - Neighbor cell ranking optimization
+  - Measurement-based neighbor ranking
+  - Capacity-aware neighbor ranking
+  - Dynamic neighbor list management
+  - Cell association area optimization
+  - Coverage-capacity optimization
+
+  # Advanced Load Balancing Features
+  - Machine learning-based prediction
+  - Hourly/daily load patterns
+  - Load forecasting models
+  - Predictive handover triggering
+  - Proactive load rebalancing
+  - Time-of-day policies
+
+  # Cross-Technology Load Balancing
+  - LTE-to-5G NR steering
+  - 5G NR-to-LTE steering
+  - Dual connectivity load split
+  - EN-DC load balancing
+  - NSA mode load distribution
+  - Network slicing load steering
+
+  # Performance Optimization
+  - Congestion avoidance
+  - Ping-pong mitigation during steering
+  - HO failure reduction
+  - Connection dropout prevention
+  - Service continuity assurance
+
+patterns:
+  - /load.*balanc|load.*balancing|MLB/i
+  - /traffic.*steer|LBTS|PBTS/i
+  - /capacity.*ho|capacity.*based/i
+  - /user.*distribut|user.*load/i
+  - /overload|load.*fraction/i
+  - /neighbor.*cell|neighbor.*list/i
+  - /handover.*load|ho.*decision/i
+  - /A3.*event|A4.*event|A5.*event/i
+  - /PRB.*util|resource.*availability/i
+  - /cell.*reselection|cell.*selection/i
+  - /queue.*length|buffer.*status/i
+  - /congestion.*load|congestion.*avoid/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - LoadExperts
+  - TrafficSteering
+  - CapacityManagement
+
+memory_namespace: loadbalance-patterns
+
+kpi_focus:
+  # Cell Load Metrics
+  - pmCellLoad
+  - pmCellLoadMeasurement
+  - pmPrbUtilDl
+  - pmPrbUtilUl
+  - pmResourceUtilization
+
+  # Load Balancing Success
+  - pmLoadBalanceSucc
+  - pmLoadBalanceAttempts
+  - pmLoadBalanceFail
+  - pmLoadBalanceSuccRate
+
+  # User Distribution
+  - pmUserDistribution
+  - pmActiveUeDl
+  - pmActiveUeUl
+  - pmUserLoadBalance
+
+  # Handover Performance
+  - pmHoExeSuccRate
+  - pmHoPrepSuccRate
+  - pmHoExeFail
+  - pmHoFailureRate
+  - pmHoPingpong
+
+  # Traffic Steering
+  - pmTrafficSteeringSucc
+  - pmTrafficSteeringAttempts
+  - pmTrafficSteeringEvents
+
+  # Congestion Metrics
+  - pmCongestionTime
+  - pmCongestionLevel
+  - pmOverloadIndicators
+
+  # Predictive Metrics
+  - pmPredictedLoad
+  - pmLoadTrend
+  - pmCapacityPrediction
+
+expertise_level: advanced
+specialization:
+  - traffic_steering
+  - mobility_load_balancing
+  - capacity_optimization
+  - load_prediction
+  - cross_technology_steering
+
+algorithms:
+  - load_distribution: "Weighted fair queuing with ML prediction"
+  - traffic_steering: "A3/A4/A5 events with load-based factors"
+  - handover_decision: "Capacity + Load + Signal quality"
+  - user_distribution: "Proportional fairness + Geographic spread"
+
+decision_thresholds:
+  - high_load: "80-90% PRB utilization"
+  - overload_condition: ">90% PRB utilization"
+  - imbalance_threshold: ">10% load difference between cells"
+  - handover_threshold: ">15% load difference"
+
+performance_targets:
+  - load_balance_success_rate: ">95%"
+  - load_imbalance_std_dev: "<5%"
+  - ho_success_rate: ">98%"
+  - congestion_time_reduction: ">30%"
+
+fallback_agents:
+  - rrm-agent
+  - admission-agent
+  - mobility-agent

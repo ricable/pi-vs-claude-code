@@ -136,3 +136,57 @@ domain-factory:
   - factory
   - coordinator
   - reviewer
+
+# Claude-Flow swarm teams (mapped to claude-flow strategies)
+cf-development:
+  - coordinator
+  - coder
+  - reviewer
+  - tester
+  - documenter
+
+cf-research:
+  - researcher
+  - coordinator
+  - planner
+  - scout
+
+cf-analysis:
+  - researcher
+  - planner
+  - coordinator
+  - reviewer
+
+cf-testing:
+  - tester
+  - reviewer
+  - red-team
+  - coder
+
+cf-optimization:
+  - coder
+  - reviewer
+  - tester
+  - planner
+
+cf-enterprise:
+  - coordinator
+  - coder
+  - reviewer
+  - tester
+  - red-team
+  - planner
+  - documenter
+
+# Swarm demo: 10 federated agents with RVF consensus
+swarm-demo:
+  - pi-swarm-orchestrator
+  - pi-consensus-leader
+  - pi-memory-coordinator
+  - pi-gossip-broker
+  - pi-security-guardian
+  - coder
+  - reviewer
+  - tester
+  - researcher
+  - planner

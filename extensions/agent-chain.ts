@@ -336,7 +336,7 @@ export default function (pi: ExtensionAPI) {
 	): Promise<{ output: string; exitCode: number; elapsed: number }> {
 		const model = ctx.model
 			? `${ctx.model.provider}/${ctx.model.id}`
-			: "openrouter/google/gemini-3-flash-preview";
+			: "openrouter/google/gemini-3.1-pro";
 
 		const agentKey = agentDef.name.toLowerCase().replace(/\s+/g, "-");
 		const agentSessionFile = join(sessionDir, `chain-${agentKey}.json`);

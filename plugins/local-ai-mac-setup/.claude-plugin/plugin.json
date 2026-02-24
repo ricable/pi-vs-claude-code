@@ -1,0 +1,28 @@
+{
+  "name": "local-ai-mac-setup",
+  "description": "Complete Mac AI development environment setup: local inference (Ollama, llama-swap, LM Studio, llama.cpp, MLX, Gollama), cc-mirror multi-provider Claude Code variants, claude-code-router configuration, Headscale mesh networking, model management, and RANO optimizer integration for Apple Silicon.",
+  "version": "1.0.0",
+  "author": {
+    "name": "rano-k8s-agents",
+    "url": "https://github.com/rano-k8s-agents"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/rano-k8s-agents/local-ai-mac-setup",
+  "homepage": "https://github.com/rano-k8s-agents/local-ai-mac-setup",
+  "keywords": [
+    "apple-silicon",
+    "local-inference",
+    "ollama",
+    "llama-swap",
+    "cc-mirror",
+    "claude-code-router",
+    "multi-provider",
+    "mac-setup",
+    "mise",
+    "tool-manager",
+    "claude-agent-sdk",
+    "claude-code-config",
+    "local-inference",
+    "full-automation"
+  ]
+}

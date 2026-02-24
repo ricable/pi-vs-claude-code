@@ -80,3 +80,26 @@ agents:
   - { name: 5g-nr, domain: telecom, specialization: "5G NR optimization" }
   - { name: 4g-lte, domain: telecom, specialization: "4G LTE optimization" }
   - { name: learning, domain: telecom, specialization: "ML-based RAN optimization" }
+
+# SWARM ORCHESTRATION (10 agents for federated learning demo)
+swarm_template:
+  tools: read,write,edit,bash,grep,find,ls
+  focus: "Swarm orchestration, consensus, memory coordination"
+  model_tiers:
+    low: "<50ms latency, $0"
+    medium: "<200ms latency, $0.001"
+    high: "<2s latency, $0.003+"
+
+swarm_agents:
+  # Swarm coordination
+  - { name: orchestrator, model_tier: high, hnsw_enabled: true }
+  - { name: consensus-leader, model_tier: high, hnsw_enabled: true }
+  - { name: memory-coordinator, model_tier: low, hnsw_enabled: true }
+  - { name: gossip-broker, model_tier: low, hnsw_enabled: false }
+  - { name: security-guardian, model_tier: medium, hnsw_enabled: true }
+  # Domain experts
+  - { name: coder, model_tier: medium, hnsw_enabled: true }
+  - { name: reviewer, model_tier: medium, hnsw_enabled: true }
+  - { name: tester, model_tier: low, hnsw_enabled: true }
+  - { name: researcher, model_tier: medium, hnsw_enabled: true }
+  - { name: planner, model_tier: medium, hnsw_enabled: true }

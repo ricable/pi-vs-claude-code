@@ -1,0 +1,22 @@
+# coder agent configuration
+type: coder
+version: "3.0.0"
+capabilities:
+  - code-generation
+  - refactoring
+  - debugging
+optimizations:
+  - flash-attention
+  - token-reduction
+createdAt: "2026-01-26T19:09:45.725Z"
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434

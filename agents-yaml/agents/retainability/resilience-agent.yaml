@@ -1,0 +1,203 @@
+name: resilience-agent
+version: 3.0.0
+description: Self-healing, outage compensation, and cell recovery specialist
+
+domain: Resilience
+technology: ALL
+agent_type: specialist
+role: resilience-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # Outage Compensation
+  - Cell outage compensation activation
+  - Compensation tilt adjustment for neighboring cells
+  - Compensation power boost configuration
+  - Outage detection threshold tuning
+  - Partial outage identification
+
+  # Self-Healing
+  - Automatic cell recovery configuration
+  - Self-healing retry policy tuning
+  - Cell restart automation
+  - Degraded cell detection
+  - Alarm-driven recovery triggers
+
+  # Cell Availability
+  - Cell downtime minimization
+  - Cell availability monitoring
+  - Planned vs unplanned downtime tracking
+  - Cell barring policy optimization
+  - Graceful degradation configuration
+
+  # Fault Management
+  - RLF-based cell health assessment
+  - Excessive RLF threshold tuning
+  - Cell performance baseline comparison
+  - Anomaly-driven compensation triggers
+
+patterns:
+  - /resilience|self.*heal|outage.*comp/i
+  - /cell.*recovery|cell.*restart|cell.*down/i
+  - /outage|compensation|fault.*manage/i
+  - /cell.*avail|downtime|cell.*bar/i
+  - /self.*healing|auto.*recovery|degraded/i
+  - /radio.*link.*fail.*rate|excessive.*rlf/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - CoverageExperts
+  - ResilienceExperts
+
+memory_namespace: resilience-patterns
+
+kpi_focus:
+  # Cell Availability
+  - pmCellDowntimeAuto
+  - pmCellDowntimeMan
+  - pmCellAvailability
+
+  # Cell Recovery
+  - pmCellRecoverySucc
+  - pmCellRecoveryAtt
+  - pmCellRecoveryTime
+
+  # RLF
+  - pmRadioLinkFailure
+  - pmRadioLinkFailureRate
+  - pmRrcReEstabAtt
+  - pmRrcReEstabSucc
+
+  # Compensation
+  - pmCompensationActive
+  - pmCompensationTiltApplied
+
+  # Alarm
+  - pmCellAlarmActive
+
+expertise_level: expert
+specialization:
+  - outage_compensation
+  - self_healing
+  - cell_availability
+  - fault_management
+
+# Resilience Tuning -- Concrete parameter ranges
+outage_compensation:
+  description: "Cell outage compensation for neighboring cells"
+  parameters:
+    - name: cellOutageCompensationActive
+      mo_class: EUtranCellFDD
+      range: "0..1"
+      type: boolean
+      default: 0
+      recommended: 1
+      rationale: "Enable automatic outage compensation. Neighboring cells adjust tilt/power."
+    - name: compensationTiltAdjustment
+      mo_class: EUtranCellFDD
+      range: "0..5"
+      unit: "degrees"
+      default: 0
+      recommended: "1-3"
+      rationale: "Max electrical tilt adjustment for compensation. Higher = more coverage extension."
+    - name: compensationPowerBoost
+      mo_class: EUtranCellFDD
+      range: "0..6"
+      unit: "dB"
+      default: 0
+      recommended: "2-4"
+      rationale: "Power boost for compensating cells. Higher = more coverage but more interference."
+
+self_healing:
+  description: "Automatic cell recovery and self-healing configuration"
+  parameters:
+    - name: selfHealingEnabled
+      mo_class: ManagedElement
+      range: "0..1"
+      type: boolean
+      default: 1
+      recommended: 1
+      rationale: "Enable automatic self-healing. Allows cell restart on detected failures."
+    - name: cellRecoveryMaxAttempts
+      mo_class: ManagedElement
+      range: "1..5"
+      default: 3
+      recommended: "2-3"
+      rationale: "Max automatic recovery attempts before escalation. Higher = more persistence."
+    - name: cellRecoveryBackoff
+      mo_class: ManagedElement
+      range: "30..600"
+      unit: "seconds"
+      default: 120
+      recommended: "60-180"
+      rationale: "Backoff between recovery attempts. Shorter = faster recovery, risk of loop."
+
+algorithms:
+  - outage_detection: "Cell availability + RLF rate + alarm correlation composite"
+  - compensation_policy: "Neighbor distance + overlap + capacity headroom -> tilt/power adjustment"
+  - recovery_decision: "Failure classification + recovery history + success probability"
+
+performance_targets:
+  - cell_availability: ">99.9% cell availability"
+  - recovery_success: ">90% automatic recovery success rate"
+  - recovery_time: "<5min mean time to recovery"
+  - outage_impact: "<5% throughput degradation during compensation"
+
+fallback_agents:
+  - coverage-agent
+  - energy-agent
+  - alarm-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: high
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 75
+  routing_hints:
+    - "Use for outage compensation and self-healing"
+    - "Route cell recovery and availability optimization here"
+    - "Handle fault management and degraded cell detection"
+    - "Coordinate with coverage-agent and alarm-agent"
+
+memory_config:
+  namespace: resilience-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.80

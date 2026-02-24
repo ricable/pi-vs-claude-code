@@ -1,0 +1,217 @@
+name: beam-agent
+version: 3.0.0
+description: NR beam management, SSB, and beam failure recovery specialist
+
+domain: Beam
+technology: NR
+agent_type: specialist
+role: beam-management-optimization
+
+# LLM Provider Configuration
+llm:
+  provider: ruvllm
+  model: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  embedding_model: ruvltra-small-0.5b-q4_k_m
+  api_url: http://localhost:9090
+  fallback_provider: ollama
+  fallback_model: glm-4.7-flash:q8_0
+  fallback_url: http://localhost:11434
+
+capabilities:
+  # SSB Optimization
+  - SSB beam periodicity tuning
+  - SSB subcarrier spacing selection
+  - SSB burst set configuration
+  - SSB power offset optimization
+  - SSB beam sweep pattern design
+
+  # Beam Failure Recovery
+  - Beam failure detection timer tuning
+  - Beam failure instance max count calibration
+  - BFR candidate beam selection
+  - BFR RACH resource configuration
+  - Beam failure recovery latency optimization
+
+  # Beam Management
+  - Beam refinement procedure optimization
+  - L1-RSRP measurement configuration
+  - CSI-RS beam measurement tuning
+  - Beam correspondence configuration
+  - Beam tracking update speed
+
+  # Beam Fairness
+  - Per-beam user distribution balancing
+  - Beam group max users configuration
+  - Wide-beam vs narrow-beam scheduling
+  - Beam-level resource allocation fairness
+
+  # Beam Selection
+  - Initial beam selection optimization
+  - Serving beam update criteria
+  - Beam switch hysteresis tuning
+  - Multi-panel beam management
+
+patterns:
+  - /beam|SSB|ssb.*period/i
+  - /beam.*fail|BFR|beam.*recovery/i
+  - /beam.*manage|beam.*track|beam.*refine/i
+  - /CSI-RS.*beam|L1-RSRP|beam.*measure/i
+  - /beam.*switch|beam.*select|beam.*correspond/i
+  - /beam.*fair|beam.*group|beam.*balanc/i
+  - /narrow.*beam|wide.*beam|beam.*sweep/i
+
+autonomy_threshold: 80
+
+broadcast_groups:
+  - RanSpecialists
+  - FunctionalGroup
+  - NRExperts
+  - BeamManagement
+
+memory_namespace: beam-patterns
+
+kpi_focus:
+  # Beam Failure
+  - pmBeamFailure
+  - pmBeamFailureRecovery
+  - pmBeamFailureRecoveryLatency
+
+  # SSB
+  - pmSsbRsrp
+  - pmSsbRsrpDistr
+  - pmSsbSinr
+
+  # CSI
+  - pmCsiRsRsrp
+  - pmCsiRsSinr
+
+  # Beam Performance
+  - pmBeamSwitchRate
+  - pmBeamSwitchSucc
+  - pmServingBeamRsrp
+
+  # Coverage (secondary)
+  - pmRadioLinkFailure
+  - pmRrcReEstabSucc
+
+expertise_level: expert
+specialization:
+  - ssb_optimization
+  - beam_failure_recovery
+  - beam_fairness
+  - beam_selection
+  - beam_tracking
+
+# Beam Tuning -- Concrete parameter ranges
+ssb_optimization:
+  description: "SSB beam periodicity and subcarrier spacing optimization"
+  parameters:
+    - name: ssbPeriodicity
+      mo_class: NRCellDU
+      range: "{20, 40, 80, 160} ms"
+      default: 20
+      recommended: "20-40"
+      rationale: "SSB burst periodicity. Lower = faster beam measurements but higher overhead."
+    - name: ssbSubcarrierSpacing
+      mo_class: NRCellDU
+      range: "{15, 30} kHz"
+      default: 30
+      recommended: 30
+      rationale: "SSB SCS. 30kHz for FR1 > 3GHz; 15kHz for low-band."
+    - name: ssbPowerOffset
+      mo_class: NRCellDU
+      range: "-6..6"
+      unit: "dB"
+      default: 0
+      recommended: "0-3"
+      rationale: "SSB power boost relative to PDSCH. Positive improves cell-edge beam detection."
+
+beam_failure_recovery:
+  description: "Beam failure detection and recovery parameter tuning"
+  parameters:
+    - name: beamFailureInstanceMaxCount
+      mo_class: NRCellDU
+      range: "1..10"
+      default: 3
+      recommended: "2-4"
+      rationale: "BFI count before declaring beam failure. Lower = faster detection, higher false positive risk."
+    - name: beamFailureDetectionTimer
+      mo_class: NRCellDU
+      range: "{10, 20, 40, 60, 80} ms"
+      default: 40
+      recommended: "20-40"
+      rationale: "BFD timer window. Shorter = faster failure detection but noisier."
+    - name: beamFailureRecoveryTimer
+      mo_class: NRCellDU
+      range: "{10, 20, 40, 60, 80, 120} ms"
+      default: 60
+      recommended: "40-80"
+      rationale: "Max time to complete BFR. Shorter = less service interruption."
+
+beam_fairness:
+  description: "Per-beam user distribution and fairness"
+  parameters:
+    - name: beamGroupMaxUsers
+      mo_class: NRCellDU
+      range: "1..64"
+      default: 16
+      recommended: "8-32"
+      rationale: "Max UEs per beam group. Limits over-concentration on best beams."
+
+algorithms:
+  - beam_quality: "SSB RSRP + CSI-RS SINR + beam failure rate composite"
+  - bfr_tuning: "Failure rate vs recovery latency vs false positive tradeoff"
+  - beam_balance: "Per-beam load distribution + RSRP variance analysis"
+
+performance_targets:
+  - beam_failure_rate: "<2% beam failure rate"
+  - bfr_success: ">95% beam failure recovery success"
+  - bfr_latency: "<100ms average BFR latency"
+  - beam_utilization: "No beam serving >2x average user count"
+
+fallback_agents:
+  - coverage-agent
+  - 5g-nr-agent
+  - antenna-agent
+
+swarm_config:
+  topology_preference: hierarchical-mesh
+  coordination_mode: queen-led
+  peer_communication: enabled
+  consensus_protocol: raft
+  max_concurrent_tasks: 8
+  task_timeout_ms: 25000
+
+routing:
+  complexity_threshold: medium
+  model_recommendation: ruvltra-medium-1.1b-q4_k_m
+  routing_model: ruvltra-claude-code-0.5b-q4_k_m
+  boost_eligible: true
+  priority_score: 55
+  routing_hints:
+    - "Use for NR beam management and SSB optimization"
+    - "Route beam failure recovery tuning here"
+    - "Handle beam fairness and selection"
+    - "Coordinate with coverage-agent and 5g-nr-agent"
+
+memory_config:
+  namespace: beam-patterns
+  vector_search_enabled: true
+  hnsw_index_enabled: true
+  auto_learn: true
+  pattern_retention_days: 180
+  consolidation_trigger: 60
+
+coordination:
+  broadcast_on_success: true
+  share_learnings: true
+  claim_duration_minutes: 20
+  handoff_protocol: graceful
+  metrics_reporting: enabled
+
+performance:
+  response_time_p50_ms: 200
+  response_time_p95_ms: 450
+  accuracy_target: 0.90
+  confidence_threshold: 0.80
